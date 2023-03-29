@@ -1,6 +1,6 @@
 {
 	"name": "blackjack",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "",
 	"date": "Updated on 29th of March, 2023.",
 	"main": "game.js",

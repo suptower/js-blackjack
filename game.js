@@ -327,45 +327,98 @@ function play() {
             game = false;
             // Print stats
             stats.printStats();
+            sleep(500);
+            start = prompt('Press any key to return to the menu.');
+            menu = 'h';
         } else if (playagain == 'y') {
             game = true;
         }
     }
 }
 
-console.clear();
-console.log('WELCOME TO BLACKJACK!');
-console.log('---------------------');
-let start = prompt("Press R to show rules or S to start the game.");
-if (start == 'r' || start == 'R') {
-    console.clear();
-    console.log('RULES:');
-    console.log('------');
-    console.log('Each participant attempts to beat the dealer by getting a count as close to 21 as possible, without going over 21.');
-    console.log('The value of a hand is the sum of the card values. Players are allowed to draw additional cards to improve their hands.');
-    console.log('At the start of the game, the dealer gives the player two cards face up. The dealer then gives himself two cards, one face up and one face down.');
-    console.log('If a player\'s first two cards are an ace and a "ten-card" (a picture card or 10), giving a count of 21 in two cards, this is a natural or "blackjack".')
-    console.log('It is up to each individual player if an ace is worth 1 or 11. Face cards are 10 and any other card is its pip value.');
-    console.log('Each turn, the player decides whether to hit (take another card) or stand (take no more cards).');
-    console.log('You can draw cards by pressing H, stand by pressing S and show both hands by pressing C.');
-    console.log('If you have a hand value of 21 you have a Blackjack and you win automatically IF the dealer does not also have a Blackjack.');
-    console.log('A hand value above 21 is a bust.');
-    console.log('If you have 5 cards and did not bust you win IF the dealer does not also have 5 cards and a hand value of less than 21.');
-    console.log('If you bust and the dealer does not you lose.');
-    console.log('If the dealer busts and you do not you win.');
-    console.log('If you and the dealer have the same hand value it is a tie.');
-    console.log('The game will also be a tie if both you and the dealer bust.');
-    console.log('The dealer will draw cards until he has a hand value of 17 or more.');
-    console.log('----------------------------------');
-    console.log('\n');
-    let start = prompt("Press S to start the game.");
-    if (start == 's' || start == 'S') {
-        play();
-    } else {
-        console.log('Invalid input');
+// MENU VAR
+// h = home
+// r = rules
+// s = start
+// i = info
+// q = quit
+let menu = 'h';
+let start = '';
+while (menu != 'x') {
+    switch (menu) {
+        case 'h':
+            console.clear();
+            console.log('WELCOME TO BLACKJACK!');
+            console.log('---------------------');
+            start = prompt("Press R to show rules or S to start the game. Press Q to quit. Press I for other information.");
+            switch (start) {
+                case 's':
+                    menu = 's';
+                    break;
+                case 'r':
+                    menu = 'r';
+                    break;
+                case 'q':
+                    menu = 'q';
+                    break;
+                case 'i':
+                    menu = 'i';
+                    break;
+                default:
+                    console.log("Invalid input. Please try again.");
+                    break;
+            }
+            break;
+        case 'r':
+                console.clear();
+                console.log('RULES:');
+                console.log('------');
+                console.log('Each participant attempts to beat the dealer by getting a count as close to 21 as possible, without going over 21.');
+                console.log('The value of a hand is the sum of the card values. Players are allowed to draw additional cards to improve their hands.');
+                console.log('At the start of the game, the dealer gives the player two cards face up. The dealer then gives himself two cards, one face up and one face down.');
+                console.log('If a player\'s first two cards are an ace and a "ten-card" (a picture card or 10), giving a count of 21 in two cards, this is a natural or "blackjack".')
+                console.log('It is up to each individual player if an ace is worth 1 or 11. Face cards are 10 and any other card is its pip value.');
+                console.log('Each turn, the player decides whether to hit (take another card) or stand (take no more cards).');
+                console.log('You can draw cards by pressing H, stand by pressing S and show both hands by pressing C.');
+                console.log('If you have a hand value of 21 you have a Blackjack and you win automatically IF the dealer does not also have a Blackjack.');
+                console.log('A hand value above 21 is a bust.');
+                console.log('If you have 5 cards and did not bust you win IF the dealer does not also have 5 cards and a hand value of less than 21.');
+                console.log('If you bust and the dealer does not you lose.');
+                console.log('If the dealer busts and you do not you win.');
+                console.log('If you and the dealer have the same hand value it is a tie.');
+                console.log('The game will also be a tie if both you and the dealer bust.');
+                console.log('The dealer will draw cards until he has a hand value of 17 or more.');
+                console.log('----------------------------------');
+                console.log('\n');
+                start = prompt("Press any key to go back to the main menu.");
+                menu = 'h';
+                break;
+        case 's':
+            play();
+            break;
+        case 'i':
+            console.clear();
+            console.log('INFORMATION:');
+            console.log('------------');
+            console.log('BLACKJACK IN JAVASCRIPT BY SUPTOWER');
+            console.log('----------------------------------');
+            console.log('GitHub: https://github.com/suptower/js-blackjack');
+            console.log('----------------------------------');
+            console.log('\n');
+            start = prompt("Press any key to go back to the main menu.");
+            menu = 'h';
+            break;
+        case 'q':
+            console.clear();
+            console.log('Thanks for playing!');
+            console.log('-------------------');
+            sleep(1500);
+            menu = 'x';
+            break;
+        default:
+            console.log("Invalid input. Please try again.");
+            break;
     }
-} else if (start == 's' || start == 'S') {
-    play();
 }
 
 
