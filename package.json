@@ -1,17 +1,18 @@
 {
-  "name": "blackjack",
-  "version": "1.0.0",
-  "description": "",
-  "main": "game.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "blackjack"
-  ],
-  "author": "suptower",
-  "license": "MIT",
-  "dependencies": {
-    "prompt-sync": "^4.2.0"
-  }
+	"name": "blackjack",
+	"version": "1.0.1",
+	"description": "",
+	"date": "Updated on 29th of March, 2023.",
+	"main": "game.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"blackjack"
+	],
+	"author": "suptower",
+	"license": "MIT",
+	"dependencies": {
+		"prompt-sync": "^4.2.0"
+	}
 }
