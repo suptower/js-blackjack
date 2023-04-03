@@ -1,5 +1,5 @@
 // Prompt for user input
-const prompt = require("prompt-sync")({ sigint: true });
+const readlineSync = require('readline-sync');
 
 // Card contents
 const suits = ['Herz', 'Pik', 'Kreuz', 'Karo'];
@@ -221,9 +221,11 @@ function play() {
             }
             else {
                 console.log("Your hand value: " + calcHand(playerHand) + " | Dealer hand value: " + dealerHand[0].value);
+                console.log("----------------------------------");
                 // Ask player for action
-                let action = prompt("Hit, stand or show hands? (h/s/c) ");
-                if (action == 'h') {
+                const actionOptions = ['Hit', 'Stand', 'Show hands'];
+                let action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', {cancel: false});
+                if (action == 0) {
                     console.clear();
                     console.log("You are drawing a card...");
                     sleep(1300);
@@ -236,7 +238,7 @@ function play() {
                     sleep(500);
                     console.log('Visible Dealer card:');
                     printCard(dealerHand[0]);
-                } else if (action == 's') {
+                } else if (action == 1) {
                     playerturn = false;
                     dealerturn = true;
                     console.clear();
@@ -322,15 +324,14 @@ function play() {
         }
         // Print game end screen
         printEnd(playerHand, dealerHand);
-        let playagain = prompt("Play again? (y/n)");
-        if (playagain == 'n') {
+        if (!readlineSync.keyInYN('Do you want to play again?')) {
             game = false;
             // Print stats
             stats.printStats();
             sleep(500);
-            start = prompt('Press any key to return to the menu.');
+            start = readlineSync.keyInPause('Press any key to go back to the main menu.');
             menu = 'h';
-        } else if (playagain == 'y') {
+        } else {
             game = true;
         }
     }
@@ -350,18 +351,19 @@ while (menu != 'x') {
             console.clear();
             console.log('WELCOME TO BLACKJACK!');
             console.log('---------------------');
-            start = prompt("Press R to show rules or S to start the game. Press Q to quit. Press I for other information.");
+            const menuInputs = ['Start', 'Rules', 'Quit', 'Info'];
+            start = readlineSync.keyInSelect(menuInputs, 'What do you want to do?', {cancel: false});
             switch (start) {
-                case 's':
+                case 0:
                     menu = 's';
                     break;
-                case 'r':
+                case 1:
                     menu = 'r';
                     break;
-                case 'q':
+                case 2:
                     menu = 'q';
                     break;
-                case 'i':
+                case 3:
                     menu = 'i';
                     break;
                 default:
@@ -390,7 +392,7 @@ while (menu != 'x') {
                 console.log('The dealer will draw cards until he has a hand value of 17 or more.');
                 console.log('----------------------------------');
                 console.log('\n');
-                start = prompt("Press any key to go back to the main menu.");
+                start = readlineSync.keyInPause('Press any key to go back to the main menu.');
                 menu = 'h';
                 break;
         case 's':
@@ -405,7 +407,7 @@ while (menu != 'x') {
             console.log('GitHub: https://github.com/suptower/js-blackjack');
             console.log('----------------------------------');
             console.log('\n');
-            start = prompt("Press any key to go back to the main menu.");
+            start = readlineSync.keyInPause('Press any key to go back to the main menu.');
             menu = 'h';
             break;
         case 'q':
@@ -413,6 +415,7 @@ while (menu != 'x') {
             console.log('Thanks for playing!');
             console.log('-------------------');
             sleep(1500);
+            console.clear();
             menu = 'x';
             break;
         default:
