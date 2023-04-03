@@ -1,6 +1,9 @@
 // Prompt for user input
 const readlineSync = require('readline-sync');
 
+// Information data
+const { version, date } = require('./package.json');
+
 // Card contents
 const suits = ['Herz', 'Pik', 'Kreuz', 'Karo'];
 const ranks = ['A', 'K', 'D', 'B', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -185,8 +188,40 @@ function printEnd(playerHand, dealerHand) {
     console.log("Dealer total was: " + calcHand(dealerHand));
 }
 
+// Automatically play game by using blackjack strategy
+function autoplay(playerHand, dealerHand) {
+    // Check if player has only two cards
+    if (playerHand.length == 2) {
+        // Check if player has an Ace
+        if (containsAce(playerHand)) {
+            switch (calcHand(playerHand)) {
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                    return 0;
+                    break;
+            }
+                
+        }
+    } else {
+    }
+        
+}
+
+function containsAce(hand) {
+    for (let card of hand) {
+        if (card.rank == 'A') {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Start game
-function play() {
+function play(autoplay) {
     console.clear();
     let game = true;
     const stats = new Stats();
@@ -222,9 +257,13 @@ function play() {
             else {
                 console.log("Your hand value: " + calcHand(playerHand) + " | Dealer hand value: " + dealerHand[0].value);
                 console.log("----------------------------------");
-                // Ask player for action
-                const actionOptions = ['Hit', 'Stand', 'Show hands'];
-                let action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', {cancel: false});
+                // Ask player for action or autoplay
+                if (autoplay) {
+                    let action = autoplay(playerHand, dealerHand);
+                } else {
+                    const actionOptions = ['Hit', 'Stand', 'Show hands'];
+                    let action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', {cancel: false});
+                }
                 if (action == 0) {
                     console.clear();
                     console.log("You are drawing a card...");
@@ -244,7 +283,7 @@ function play() {
                     console.clear();
                     console.log("You stand with a hand value of: " + calcHand(playerHand));
                     sleep(1000);
-                } else if (action == 'c') {
+                } else if (action == 2) {
                     console.clear();
                     console.log("Showing hands...");
                     sleep(1000);
@@ -344,30 +383,34 @@ function play() {
 // i = info
 // q = quit
 let menu = 'h';
-let start = '';
+let start = 0;
 while (menu != 'x') {
     switch (menu) {
         case 'h':
             console.clear();
             console.log('WELCOME TO BLACKJACK!');
             console.log('---------------------');
-            const menuInputs = ['Start', 'Rules', 'Quit', 'Info'];
+            var menuInputs = ['Start', 'Autoplay', 'Rules', 'Info', 'Quit'];
             start = readlineSync.keyInSelect(menuInputs, 'What do you want to do?', {cancel: false});
             switch (start) {
                 case 0:
                     menu = 's';
                     break;
                 case 1:
-                    menu = 'r';
+                    menu = 'a';
                     break;
                 case 2:
-                    menu = 'q';
+                    menu = 'r';
                     break;
                 case 3:
                     menu = 'i';
                     break;
+                case 4:
+                    menu = 'q';
+                    break;
                 default:
                     console.log("Invalid input. Please try again.");
+                    menu = 'h';
                     break;
             }
             break;
@@ -392,11 +435,14 @@ while (menu != 'x') {
                 console.log('The dealer will draw cards until he has a hand value of 17 or more.');
                 console.log('----------------------------------');
                 console.log('\n');
-                start = readlineSync.keyInPause('Press any key to go back to the main menu.');
+                let pause1 = readlineSync.keyInPause('Press any key to go back to the main menu.');
                 menu = 'h';
                 break;
         case 's':
-            play();
+            play(false);
+            break;
+        case 'a':
+            autoplay(true);
             break;
         case 'i':
             console.clear();
@@ -404,10 +450,11 @@ while (menu != 'x') {
             console.log('------------');
             console.log('BLACKJACK IN JAVASCRIPT BY SUPTOWER');
             console.log('----------------------------------');
+            console.log('Version: ' + version + ' (' + date + ')');
             console.log('GitHub: https://github.com/suptower/js-blackjack');
             console.log('----------------------------------');
             console.log('\n');
-            start = readlineSync.keyInPause('Press any key to go back to the main menu.');
+            let pause2 = readlineSync.keyInPause('Press any key to go back to the main menu.');
             menu = 'h';
             break;
         case 'q':
@@ -420,6 +467,7 @@ while (menu != 'x') {
             break;
         default:
             console.log("Invalid input. Please try again.");
+            menu = 'h';
             break;
     }
 }
