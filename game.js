@@ -177,9 +177,18 @@ class Stats {
         console.log('Winrate: ' + this.getWinrate() + '%');
         sleep(500);
     }
+    reset() {
+        this.wins = 0;
+        this.losses = 0;
+        this.draws = 0;
+        this.blackjacks = 0;
+    }
 }
 
+const stats = new Stats();
+
 function printEnd(playerHand, dealerHand) {
+    console.log("Game summary: (Game " + stats.getGames() + ")");
     console.log("Your hand was:");
     printHand(playerHand);
     console.log("Your total was: " + calcHand(playerHand));
@@ -188,29 +197,71 @@ function printEnd(playerHand, dealerHand) {
     console.log("Dealer total was: " + calcHand(dealerHand));
 }
 
-// Automatically play game by using blackjack strategy
-function autoplay(playerHand, dealerHand) {
+// Automatically play game by using blackjack strategy, return 0 => Hit, 1 => Stand
+function autodecide(playerHand, dealerHand) {
+    sleep(1000);
+    console.log("Autoplaying...");
     // Check if player has only two cards
-    if (playerHand.length == 2) {
-        // Check if player has an Ace
-        if (containsAce(playerHand)) {
-            switch (calcHand(playerHand)) {
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
+    if (playerHand.length == 2 && containsAce(playerHand)) {
+        switch (calcHand(playerHand)) {
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+                return 0;
+                break;
+            case 18:
+                if (dealerHand[0].value == 9 || dealerHand[0].value == 10 || dealerHand[0].value == 11) {
                     return 0;
-                    break;
-            }
-                
-        }
+                } else {
+                    return 1;
+                }
+                break;
+            default:
+                return 1;
+                break;
+        }    
     } else {
+        switch (calcHand(playerHand)) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+                return 0;
+                break;
+            case 12:
+                if (dealerHand[0].value == 4 || dealerHand[0].value == 5 || dealerHand[0].value == 6) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+                break;
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+                if (dealerHand[0].value == 2 || dealerHand[0].value == 3 || dealerHand[0].value == 4 || dealerHand[0].value == 5 || dealerHand[0].value == 6) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+                break;
+            default:
+                return 1;
+        }
     }
-        
 }
 
+// Check if hand contains Ace
 function containsAce(hand) {
     for (let card of hand) {
         if (card.rank == 'A') {
@@ -224,7 +275,6 @@ function containsAce(hand) {
 function play(autoplay) {
     console.clear();
     let game = true;
-    const stats = new Stats();
     getDeck(4);
     shuffle(1000);
     while (game) {
@@ -258,11 +308,12 @@ function play(autoplay) {
                 console.log("Your hand value: " + calcHand(playerHand) + " | Dealer hand value: " + dealerHand[0].value);
                 console.log("----------------------------------");
                 // Ask player for action or autoplay
+                let action = 0;
                 if (autoplay) {
-                    let action = autoplay(playerHand, dealerHand);
+                    action = autodecide(playerHand, dealerHand);
                 } else {
                     const actionOptions = ['Hit', 'Stand', 'Show hands'];
-                    let action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', {cancel: false});
+                    action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', {cancel: false});
                 }
                 if (action == 0) {
                     console.clear();
@@ -390,7 +441,7 @@ while (menu != 'x') {
             console.clear();
             console.log('WELCOME TO BLACKJACK!');
             console.log('---------------------');
-            var menuInputs = ['Start', 'Autoplay', 'Rules', 'Info', 'Quit'];
+            var menuInputs = ['Start', 'Autoplay', 'Rules', 'Info', 'Reset stats', 'Quit'];
             start = readlineSync.keyInSelect(menuInputs, 'What do you want to do?', {cancel: false});
             switch (start) {
                 case 0:
@@ -406,6 +457,9 @@ while (menu != 'x') {
                     menu = 'i';
                     break;
                 case 4:
+                    menu = 'rs';
+                    break;
+                case 5:
                     menu = 'q';
                     break;
                 default:
@@ -442,7 +496,7 @@ while (menu != 'x') {
             play(false);
             break;
         case 'a':
-            autoplay(true);
+            play(true);
             break;
         case 'i':
             console.clear();
@@ -455,6 +509,16 @@ while (menu != 'x') {
             console.log('----------------------------------');
             console.log('\n');
             let pause2 = readlineSync.keyInPause('Press any key to go back to the main menu.');
+            menu = 'h';
+            break;
+        case 'rs':
+            console.clear();
+            console.log('Resetting stats...');
+            sleep(1000);
+            stats.reset();
+            console.log('Stats reset!');
+            sleep(1000);
+            let pause3 = readlineSync.keyInPause('Press any key to go back to the main menu.');
             menu = 'h';
             break;
         case 'q':

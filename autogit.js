@@ -1,5 +1,5 @@
 const fs = require('fs');
-const execSync = require('child_process').execSync;
+const exec = require('child_process').exec;
 const dateTime = new Date();
 const day = dateTime.getDate();
 
@@ -25,28 +25,37 @@ const yearString = dateTime.getFullYear().toString();
 const output = 'Updated on ' + dayString + ' of ' + monthString + ', ' + yearString + '.';
 console.log(output);
 
-fs.readFile('./package.json', (err, data) => {
-	if (err) throw err;
-
-	let packageJsonObj = JSON.parse(data);
-	packageJsonObj.date = output;
-	packageJsonObj = JSON.stringify(packageJsonObj, null, '\t');
-
-	fs.writeFile('./package.json', packageJsonObj, (err) => {
+function updatePackageJson(_callback) {
+	fs.readFile('./package.json', (err, data) => {
 		if (err) throw err;
-		console.log('Date in package.json has been updated.');
+
+		let packageJsonObj = JSON.parse(data);
+		packageJsonObj.date = output;
+		packageJsonObj = JSON.stringify(packageJsonObj, null, '\t');
+
+		fs.writeFile('./package.json', packageJsonObj, (err) => {
+			if (err) throw err;
+			console.log('Date in package.json has been updated.');
+		});
 	});
-});
-
-let gitcom = '';
-for (val of process.argv) {
-    if (process.argv.length < 3) {
-        gitcom = 'No commit message provided. ' + output;
-
-    }
-    if (val != process.argv[0] && val != process.argv[1]) {
-        gitcom += val + ' ';
-    }
+	_callback();
 }
 
-execSync('npm version patch --no-git-tag-version && git add . && git commit -m "' + gitcom + '" && git push origin master');
+function commit() {
+	updatePackageJson(function() {
+		if (process.argv.length < 3) {
+			exec('npm version patch --no-git-tag-version && git add . && git commit && git push origin');
+		}
+		else {
+			let gitcom = '';
+			for (const val of process.argv) {
+				if (val != process.argv[0] && val != process.argv[1]) {
+					gitcom += val + ' ';
+				}
+			}
+			exec('npm version patch --no-git-tag-version && git add . && git commit -m "' + gitcom + '" && git push origin');
+		}
+	});
+}
+
+commit();
