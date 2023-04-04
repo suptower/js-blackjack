@@ -1,6 +1,9 @@
 // Prompt for user input
 const readlineSync = require('readline-sync');
 
+// Information data
+const { version, date } = require('./package.json');
+
 // Card contents
 const suits = ['Herz', 'Pik', 'Kreuz', 'Karo'];
 const ranks = ['A', 'K', 'D', 'B', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -174,9 +177,18 @@ class Stats {
         console.log('Winrate: ' + this.getWinrate() + '%');
         sleep(500);
     }
+    reset() {
+        this.wins = 0;
+        this.losses = 0;
+        this.draws = 0;
+        this.blackjacks = 0;
+    }
 }
 
+const stats = new Stats();
+
 function printEnd(playerHand, dealerHand) {
+    console.log("Game summary: (Game " + stats.getGames() + ")");
     console.log("Your hand was:");
     printHand(playerHand);
     console.log("Your total was: " + calcHand(playerHand));
@@ -185,11 +197,84 @@ function printEnd(playerHand, dealerHand) {
     console.log("Dealer total was: " + calcHand(dealerHand));
 }
 
+// Automatically play game by using blackjack strategy, return 0 => Hit, 1 => Stand
+function autodecide(playerHand, dealerHand) {
+    sleep(1000);
+    console.log("Autoplaying...");
+    // Check if player has only two cards
+    if (playerHand.length == 2 && containsAce(playerHand)) {
+        switch (calcHand(playerHand)) {
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+                return 0;
+                break;
+            case 18:
+                if (dealerHand[0].value == 9 || dealerHand[0].value == 10 || dealerHand[0].value == 11) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+                break;
+            default:
+                return 1;
+                break;
+        }    
+    } else {
+        switch (calcHand(playerHand)) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+                return 0;
+                break;
+            case 12:
+                if (dealerHand[0].value == 4 || dealerHand[0].value == 5 || dealerHand[0].value == 6) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+                break;
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+                if (dealerHand[0].value == 2 || dealerHand[0].value == 3 || dealerHand[0].value == 4 || dealerHand[0].value == 5 || dealerHand[0].value == 6) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+                break;
+            default:
+                return 1;
+        }
+    }
+}
+
+// Check if hand contains Ace
+function containsAce(hand) {
+    for (let card of hand) {
+        if (card.rank == 'A') {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Start game
-function play() {
+function play(autoplay) {
     console.clear();
     let game = true;
-    const stats = new Stats();
     getDeck(4);
     shuffle(1000);
     while (game) {
@@ -222,9 +307,14 @@ function play() {
             else {
                 console.log("Your hand value: " + calcHand(playerHand) + " | Dealer hand value: " + dealerHand[0].value);
                 console.log("----------------------------------");
-                // Ask player for action
-                const actionOptions = ['Hit', 'Stand', 'Show hands'];
-                let action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', {cancel: false});
+                // Ask player for action or autoplay
+                let action = 0;
+                if (autoplay) {
+                    action = autodecide(playerHand, dealerHand);
+                } else {
+                    const actionOptions = ['Hit', 'Stand', 'Show hands'];
+                    action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', {cancel: false});
+                }
                 if (action == 0) {
                     console.clear();
                     console.log("You are drawing a card...");
@@ -244,7 +334,7 @@ function play() {
                     console.clear();
                     console.log("You stand with a hand value of: " + calcHand(playerHand));
                     sleep(1000);
-                } else if (action == 'c') {
+                } else if (action == 2) {
                     console.clear();
                     console.log("Showing hands...");
                     sleep(1000);
@@ -344,30 +434,37 @@ function play() {
 // i = info
 // q = quit
 let menu = 'h';
-let start = '';
+let start = 0;
 while (menu != 'x') {
     switch (menu) {
         case 'h':
             console.clear();
             console.log('WELCOME TO BLACKJACK!');
             console.log('---------------------');
-            const menuInputs = ['Start', 'Rules', 'Quit', 'Info'];
+            var menuInputs = ['Start', 'Autoplay', 'Rules', 'Info', 'Reset stats', 'Quit'];
             start = readlineSync.keyInSelect(menuInputs, 'What do you want to do?', {cancel: false});
             switch (start) {
                 case 0:
                     menu = 's';
                     break;
                 case 1:
-                    menu = 'r';
+                    menu = 'a';
                     break;
                 case 2:
-                    menu = 'q';
+                    menu = 'r';
                     break;
                 case 3:
                     menu = 'i';
                     break;
+                case 4:
+                    menu = 'rs';
+                    break;
+                case 5:
+                    menu = 'q';
+                    break;
                 default:
                     console.log("Invalid input. Please try again.");
+                    menu = 'h';
                     break;
             }
             break;
@@ -392,11 +489,14 @@ while (menu != 'x') {
                 console.log('The dealer will draw cards until he has a hand value of 17 or more.');
                 console.log('----------------------------------');
                 console.log('\n');
-                start = readlineSync.keyInPause('Press any key to go back to the main menu.');
+                let pause1 = readlineSync.keyInPause('Press any key to go back to the main menu.');
                 menu = 'h';
                 break;
         case 's':
-            play();
+            play(false);
+            break;
+        case 'a':
+            play(true);
             break;
         case 'i':
             console.clear();
@@ -404,10 +504,21 @@ while (menu != 'x') {
             console.log('------------');
             console.log('BLACKJACK IN JAVASCRIPT BY SUPTOWER');
             console.log('----------------------------------');
+            console.log('Version: ' + version + ' (' + date + ')');
             console.log('GitHub: https://github.com/suptower/js-blackjack');
             console.log('----------------------------------');
             console.log('\n');
-            start = readlineSync.keyInPause('Press any key to go back to the main menu.');
+            let pause2 = readlineSync.keyInPause('Press any key to go back to the main menu.');
+            menu = 'h';
+            break;
+        case 'rs':
+            console.clear();
+            console.log('Resetting stats...');
+            sleep(1000);
+            stats.reset();
+            console.log('Stats reset!');
+            sleep(1000);
+            let pause3 = readlineSync.keyInPause('Press any key to go back to the main menu.');
             menu = 'h';
             break;
         case 'q':
@@ -420,6 +531,7 @@ while (menu != 'x') {
             break;
         default:
             console.log("Invalid input. Please try again.");
+            menu = 'h';
             break;
     }
 }

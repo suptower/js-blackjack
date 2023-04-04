@@ -1,8 +1,8 @@
 {
 	"name": "blackjack",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "",
-	"date": "Updated on 29th of March, 2023.",
+	"date": "Updated on 4th of April, 2023.",
 	"main": "game.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
