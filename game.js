@@ -431,6 +431,7 @@ function play(autoplay) {
 // h = home
 // r = rules
 // s = start
+// a = autoplay
 // i = info
 // q = quit
 let menu = 'h';

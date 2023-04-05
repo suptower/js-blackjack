@@ -1,8 +1,8 @@
 {
 	"name": "blackjack",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "",
-	"date": "Updated on 4th of April, 2023.",
+	"date": "Updated on 5th of April, 2023.",
 	"main": "game.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
@@ -13,7 +13,6 @@
 	"author": "suptower",
 	"license": "MIT",
 	"dependencies": {
-		"prompt-sync": "^4.2.0",
 		"readline-sync": "^1.4.10"
 	}
 }
