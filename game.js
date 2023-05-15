@@ -15,6 +15,9 @@ let cards = [];
 // Deck
 let deck = [];
 
+// Define stack size, can be customized in main menu via options
+let stackSize = 4;
+
 // Create cards
 for (let suit of suits) {
     let i = 0;
@@ -72,7 +75,7 @@ function drawCard(deck) {
     if (deck.length == 0) {
         console.log("No more cards in deck!");
         console.log("Shuffling deck...");
-        getDeck(4);
+        getDeck(stackSize);
         shuffle(1000);
         console.log("Deck has cards: +" + deck.length );
     }
@@ -275,7 +278,7 @@ function containsAce(hand) {
 function play(autoplay) {
     console.clear();
     let game = true;
-    getDeck(4);
+    getDeck(stackSize);
     shuffle(1000);
     while (game) {
         stats.addGame();
@@ -433,6 +436,7 @@ function play(autoplay) {
 // s = start
 // a = autoplay
 // i = info
+// o = options
 // q = quit
 let menu = 'h';
 let start = 0;
@@ -442,7 +446,7 @@ while (menu != 'x') {
             console.clear();
             console.log('WELCOME TO BLACKJACK!');
             console.log('---------------------');
-            var menuInputs = ['Start', 'Autoplay', 'Rules', 'Info', 'Reset stats', 'Quit'];
+            var menuInputs = ['Start', 'Autoplay', 'Rules', 'Info', 'Options', 'Quit'];
             start = readlineSync.keyInSelect(menuInputs, 'What do you want to do?', {cancel: false});
             switch (start) {
                 case 0:
@@ -458,7 +462,7 @@ while (menu != 'x') {
                     menu = 'i';
                     break;
                 case 4:
-                    menu = 'rs';
+                    menu = 'o';
                     break;
                 case 5:
                     menu = 'q';
@@ -489,6 +493,12 @@ while (menu != 'x') {
                 console.log('The game will also be a tie if both you and the dealer bust.');
                 console.log('The dealer will draw cards until he has a hand value of 17 or more.');
                 console.log('----------------------------------');
+                console.log('The stack size is the amount of decks used in the game. The default is 4.');
+                console.log('You can change the stack size in the options menu. Valid stack sizes are 1-16.');
+                console.log('----------------------------------');
+                console.log('The autoplay function will play the game for you.');
+                console.log('The decision to hit or stand in autoplay is based on known blackjack strategy.');
+                console.log('----------------------------------');
                 console.log('\n');
                 let pause1 = readlineSync.keyInPause('Press any key to go back to the main menu.');
                 menu = 'h';
@@ -512,15 +522,46 @@ while (menu != 'x') {
             let pause2 = readlineSync.keyInPause('Press any key to go back to the main menu.');
             menu = 'h';
             break;
-        case 'rs':
+        case 'o':
             console.clear();
-            console.log('Resetting stats...');
-            sleep(1000);
-            stats.reset();
-            console.log('Stats reset!');
-            sleep(1000);
-            let pause3 = readlineSync.keyInPause('Press any key to go back to the main menu.');
-            menu = 'h';
+            console.log('OPTIONS');
+            console.log('---------------------');
+            var optionInputs = ['Change stack size', 'Reset stats', 'Back'];
+            start = readlineSync.keyInSelect(optionInputs, 'What do you want to do?', {cancel: false});
+            switch (start) {
+                case 0:
+                    console.clear();
+                    var newStackSize = readlineSync.questionInt('Enter new stack size (1-16) [DEFAULT: 4]: ');
+                    while (newStackSize < 1 || newStackSize > 16) {
+                        console.log('Invalid stack size. Please try again.');
+                        newStackSize = readlineSync.questionInt('Enter new stack size (1-16) [DEFAULT: 4]: ');
+                    }
+                    console.log('Changing stack size to ' + newStackSize + '...');
+                    sleep(1000);
+                    stackSize = newStackSize;
+                    console.log('Stack size changed!');
+                    sleep(1000);
+                    newStackSize = readlineSync.keyInPause('Press any key to go back to the main menu.');
+                    menu = 'h';
+                    break;
+                case 1:
+                    console.clear();
+                    console.log('Resetting stats...');
+                    sleep(1000);
+                    stats.reset();
+                    console.log('Stats reset!');
+                    sleep(1000);
+                    let pause3 = readlineSync.keyInPause('Press any key to go back to the main menu.');
+                    menu = 'h';
+                    break;
+                case 2:
+                    menu = 'h';
+                    break;
+                default:
+                    console.log("Invalid input. Please try again.");
+                    menu = 'o';
+                    break;
+            }
             break;
         case 'q':
             console.clear();
