@@ -1,6 +1,6 @@
 {
 	"name": "blackjack",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "",
 	"date": "Updated on 15th of May, 2023.",
 	"main": "game.js",
@@ -14,5 +14,12 @@
 	"license": "MIT",
 	"dependencies": {
 		"readline-sync": "^1.4.10"
+	},
+	"devDependencies": {
+		"eslint": "^8.40.0",
+		"eslint-config-standard": "^17.0.0",
+		"eslint-plugin-import": "^2.27.5",
+		"eslint-plugin-n": "^15.7.0",
+		"eslint-plugin-promise": "^6.1.1"
 	}
 }
