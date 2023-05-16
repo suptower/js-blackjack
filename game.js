@@ -276,6 +276,7 @@ class MoneyManager {
     console.log('You have ' + this.money + '€.')
   }
 
+  // Double the bet if lost, reset if won
   getNextBet () {
     if (this.getLastBet() === 0) {
       return this.startBet
@@ -292,12 +293,13 @@ class MoneyManager {
   }
 
   reset () {
-    this.money = this.startM
+    this.money = this.startMoney
     this.startBet = 0
     this.lastBet = 0
     this.didWin = false
   }
 
+  // Unable to bet if money is less than 2
   checkMoney () {
     if (this.getMoney() < 2) {
       return false
@@ -403,6 +405,7 @@ function play (autoplay) {
     }
     stats.addGame()
     console.clear()
+    // Set bet by getNextBet if autoplay, else ask for bet
     if (autoplay) {
       currentBet = moneyManager.getNextBet()
     } else {
@@ -415,6 +418,7 @@ function play (autoplay) {
     }
     console.log('You bet ' + currentBet + '€')
     sleep(500)
+    // set last bet and subtract money
     moneyManager.setLastBet(currentBet)
     moneyManager.subMoney(currentBet)
     const dealerHand = []
@@ -501,6 +505,7 @@ function play (autoplay) {
     sleep(1500)
     console.clear()
     // WIN CONDITIONS
+    // Blackjack pays 3:2, other wins pay 1:1, Tie returns bet
     if (calcHand(playerHand) === 21 && calcHand(dealerHand) !== 21) {
       // Player has blackjack or dealer doesn't
       console.log('You have a Blackjack! You win!')
