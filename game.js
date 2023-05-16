@@ -62,7 +62,8 @@ function printCard (card) {
   console.log('-----------')
   console.log('| ' + getSymbol(card.suit) + '       |')
   console.log('|         |')
-  if (card.rank === 10) {
+  if (card.rank === '10') {
+    // Padding has to be adapted for 10
     console.log('|    ' + card.rank + '   |')
   } else {
     console.log('|    ' + card.rank + '    |')
@@ -121,7 +122,8 @@ function printHand (hand) {
     output[0] += '----------- '
     output[1] += '| ' + getSymbol(card.suit) + '       | '
     output[2] += '|         | '
-    if (card.rank === 10) {
+    if (card.rank === '10') {
+      // Padding has to be adapted for 10
       output[3] += '|    ' + card.rank + '   | '
     } else {
       output[3] += '|    ' + card.rank + '    | '
