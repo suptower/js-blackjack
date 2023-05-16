@@ -174,7 +174,15 @@ class Stats {
     this.games++
   }
 
-  printStats () {
+  getRevenue (moneyNow, startingMoney) {
+    return moneyNow - startingMoney
+  }
+
+  getAverageRevenue (moneyNow, startingMoney) {
+    return Math.round((this.getRevenue(moneyNow, startingMoney) / this.getGames()) * 100) / 100
+  }
+
+  printStats (moneymgmt) {
     sleep(200)
     console.log('---STATS---')
     sleep(200)
@@ -190,6 +198,10 @@ class Stats {
     sleep(200)
     console.log('Winrate: ' + this.getWinrate() + '%')
     sleep(500)
+    console.log('Revenue: ' + this.getRevenue(moneymgmt.getMoney(), moneymgmt.getStartMoney()))
+    sleep(200)
+    console.log('Average revenue per game: ' + this.getAverageRevenue(moneymgmt.getMoney(), moneymgmt.getStartMoney()))
+    sleep(200)
   }
 
   reset () {
@@ -201,6 +213,100 @@ class Stats {
 }
 
 const stats = new Stats()
+
+// Class for managing money
+class MoneyManager {
+  constructor () {
+    this.money = 1000
+    this.startMoney = 1000
+    this.startBet = 0
+    this.lastBet = 0
+    this.didWin = false
+  }
+
+  getMoney () {
+    return this.money
+  }
+
+  getStartMoney () {
+    return this.startMoney
+  }
+
+  getStartBet () {
+    return this.startBet
+  }
+
+  getLastBet () {
+    return this.lastBet
+  }
+
+  getDidWin () {
+    return this.didWin
+  }
+
+  setMoney (money) {
+    this.money = money
+  }
+
+  setStartMoney (startMoney) {
+    this.startMoney = startMoney
+  }
+
+  setStartBet (startBet) {
+    this.startBet = startBet
+  }
+
+  setLastBet (lastBet) {
+    this.lastBet = lastBet
+  }
+
+  setDidWin (didWin) {
+    this.didWin = didWin
+  }
+
+  addMoney (money) {
+    this.money += money
+  }
+
+  subMoney (money) {
+    this.money -= money
+  }
+
+  printMoney () {
+    console.log('You have ' + this.money + '€.')
+  }
+
+  getNextBet () {
+    if (this.getLastBet() === 0) {
+      return this.startBet
+    }
+    if (this.didWin) {
+      this.didWin = false
+      return this.startBet
+    } else {
+      if (this.getLastBet() * 2 > this.getMoney()) {
+        return this.getMoney()
+      }
+      return this.getLastBet() * 2
+    }
+  }
+
+  reset () {
+    this.money = this.startM
+    this.startBet = 0
+    this.lastBet = 0
+    this.didWin = false
+  }
+
+  checkMoney () {
+    if (this.getMoney() < 2) {
+      return false
+    }
+    return true
+  }
+}
+
+const moneyManager = new MoneyManager()
 
 function printEnd (playerHand, dealerHand) {
   console.log('Game summary: (Game ' + stats.getGames() + ')')
@@ -282,13 +388,35 @@ function containsAce (hand) {
 
 // Start game
 function play (autoplay) {
+  moneyManager.setMoney(moneyManager.getStartMoney())
   console.clear()
   let game = true
+  let currentBet = 0
   getDeck(stackSize)
   shuffle(1000)
   while (game) {
+    if (!moneyManager.checkMoney()) {
+      console.log('You are out of money!')
+      sleep(1000)
+      game = false
+      break
+    }
     stats.addGame()
     console.clear()
+    if (autoplay) {
+      currentBet = moneyManager.getNextBet()
+    } else {
+      console.log('You have ' + moneyManager.getMoney() + '€')
+      currentBet = readlineSync.questionInt('Place your bet (2 - ' + moneyManager.getMoney() + '): ')
+      while (currentBet < 2 || currentBet > moneyManager.getMoney()) {
+        console.log('Invalid bet!')
+        currentBet = readlineSync.questionInt('Place your bet (2 - ' + moneyManager.getMoney() + '): ')
+      }
+    }
+    console.log('You bet ' + currentBet + '€')
+    sleep(500)
+    moneyManager.setLastBet(currentBet)
+    moneyManager.subMoney(currentBet)
     const dealerHand = []
     const playerHand = []
     console.log('Both players are drawing their first cards...')
@@ -378,14 +506,25 @@ function play (autoplay) {
       console.log('You have a Blackjack! You win!')
       stats.addWin()
       stats.addBlackjack()
+      console.log('You won ' + currentBet * 2.5 + '!')
+      moneyManager.addMoney(currentBet * 2.5)
+      moneyManager.setDidWin(true)
+      console.log('You have ' + moneyManager.getMoney() + '€.')
     } else if (playerHand.length === 5 && calcHand(playerHand) < 21 && calcHand(dealerHand) !== 21 && dealerHand.length < 5) {
       // Player has 5 cards and dealer doesn't
       console.log('You have 5 cards and a total of ' + calcHand(playerHand) + '! You win!')
       stats.addWin()
+      console.log('You won ' + currentBet * 2 + '!')
+      moneyManager.addMoney(currentBet * 2)
+      moneyManager.setDidWin(true)
+      console.log('You have ' + moneyManager.getMoney() + '€.')
     } else if (calcHand(playerHand) > calcHand(dealerHand) && calcHand(playerHand) <= 21) {
       // Player has higher hand value than dealer
       console.log('You have a higher hand value than the dealer! You win!')
       stats.addWin()
+      console.log('You won ' + currentBet * 2 + '!')
+      moneyManager.addMoney(currentBet * 2)
+      moneyManager.setDidWin(true)
     } else if (calcHand(dealerHand) === 21 && calcHand(playerHand) !== 21) {
       // Dealer has blackjack and player doesn't
       console.log('Dealer has a Blackjack! Dealer wins!')
@@ -403,6 +542,10 @@ function play (autoplay) {
       // Dealer went over 21
       console.log('Dealer went over 21! You win!')
       stats.addWin()
+      console.log('You won ' + currentBet * 2 + '!')
+      moneyManager.addMoney(currentBet * 2)
+      moneyManager.setDidWin(true)
+      console.log('You have ' + moneyManager.getMoney() + '€.')
     } else if (calcHand(dealerHand) > calcHand(playerHand) && calcHand(dealerHand) <= 21) {
       // Dealer has higher hand value than player
       console.log('Dealer has a higher hand value than you! Dealer wins!')
@@ -411,13 +554,18 @@ function play (autoplay) {
       // Tie
       console.log("It's a tie!")
       stats.addDraw()
+      console.log('You got your bet of ' + currentBet + '€ back.')
+      moneyManager.addMoney(currentBet)
+      moneyManager.setDidWin(false)
+      moneyManager.setLastBet(currentBet / 2)
+      console.log('You have ' + moneyManager.getMoney() + '€.')
     }
     // Print game end screen
     printEnd(playerHand, dealerHand)
     if (!readlineSync.keyInYN('Do you want to play again?')) {
       game = false
       // Print stats
-      stats.printStats()
+      stats.printStats(moneyManager)
       sleep(500)
       start = readlineSync.keyInPause('Press any key to go back to the main menu.')
       menu = 'h'
@@ -425,6 +573,11 @@ function play (autoplay) {
       game = true
     }
   }
+  sleep(500)
+  console.clear()
+  console.log('Going back to main menu...')
+  sleep(1000)
+  menu = 'h'
 }
 
 // MENU VAR
@@ -504,9 +657,17 @@ while (menu !== 'x') {
     case 's':
       play(false)
       break
-    case 'a':
+    case 'a': {
+      console.clear()
+      let newStartingBet = readlineSync.questionInt('What is your starting bet? (1 - ' + moneyManager.getMoney() + ') ?: ')
+      while (newStartingBet < 1 || newStartingBet > moneyManager.getMoney()) {
+        console.log('Invalid input. Please try again.')
+        newStartingBet = readlineSync.questionInt('What is your starting bet? (1 - ' + moneyManager.getMoney() + ') ?: ')
+      }
+      moneyManager.setStartBet(newStartingBet)
       play(true)
       break
+    }
     case 'i':
       console.clear()
       console.log('INFORMATION:')
@@ -524,15 +685,15 @@ while (menu !== 'x') {
       console.clear()
       console.log('OPTIONS')
       console.log('---------------------')
-      const optionInputs = ['Change stack size', 'Reset stats', 'Back']
+      const optionInputs = ['Change stack size', 'Reset stats', 'Starting money', 'Back']
       start = readlineSync.keyInSelect(optionInputs, 'What do you want to do?', { cancel: false })
       switch (start) {
         case 0: {
           console.clear()
-          let newStackSize = readlineSync.questionInt('Enter new stack size (1-16) [DEFAULT: 4]: ')
+          let newStackSize = readlineSync.questionInt('Enter new stack size (1-16) [DEFAULT: 4] : ')
           while (newStackSize < 1 || newStackSize > 16) {
             console.log('Invalid stack size. Please try again.')
-            newStackSize = readlineSync.questionInt('Enter new stack size (1-16) [DEFAULT: 4]: ')
+            newStackSize = readlineSync.questionInt('Enter new stack size (1-16) [DEFAULT: 4] : ')
           }
           console.log('Changing stack size to ' + newStackSize + '...')
           sleep(1000)
@@ -553,7 +714,23 @@ while (menu !== 'x') {
           readlineSync.keyInPause('Press any key to go back to the main menu.')
           menu = 'h'
           break
-        case 2:
+        case 2: {
+          console.clear()
+          let newStartingMoney = readlineSync.questionInt('Enter new starting money (2-50.000) [DEFAULT: 1.000] : ')
+          while (newStartingMoney < 2 || newStartingMoney > 50000) {
+            console.log('Invalid starting money. Please try again.')
+            newStartingMoney = readlineSync.questionInt('Enter new starting money (2-50.000) [DEFAULT: 1.000] : ')
+          }
+          console.log('Changing starting money to ' + newStartingMoney + '...')
+          sleep(1000)
+          moneyManager.setStartMoney(newStartingMoney)
+          console.log('Starting money changed!')
+          sleep(1000)
+          readlineSync.keyInPause('Press any key to go back to the main menu.')
+          menu = 'h'
+          break
+        }
+        case 3:
           menu = 'h'
           break
         default:
