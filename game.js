@@ -394,9 +394,11 @@ function play (autoplay) {
   console.clear()
   let game = true
   let currentBet = 0
+  let insurance = false
   getDeck(stackSize)
   shuffle(1000)
   while (game) {
+    insurance = false
     if (!moneyManager.checkMoney()) {
       console.log('You are out of money!')
       sleep(1000)
@@ -452,7 +454,10 @@ function play (autoplay) {
         if (autoplay) {
           action = autodecide(playerHand, dealerHand)
         } else {
-          const actionOptions = ['Hit', 'Stand', 'Show hands']
+          let actionOptions = ['Hit', 'Stand', 'Show hands']
+          if (playerHand.length === 2 && containsAce(dealerHand)) {
+            actionOptions = ['Hit', 'Stand', 'Show hands', 'Insurance']
+          }
           action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', { cancel: false })
         }
         if (action === 0) {
@@ -482,6 +487,19 @@ function play (autoplay) {
           printHand(playerHand)
           console.log('Visible Dealer card:')
           printCard(dealerHand[0])
+        } else if (action === 3) {
+          console.clear()
+          let insuranceBet = 0
+          if (currentBet / 2 > moneyManager.getMoney()) {
+            insuranceBet = moneyManager.getMoney()
+          } else {
+            insuranceBet = currentBet / 2
+          }
+          console.log('You buy insurance for ' + insuranceBet + '€')
+          sleep(1000)
+          moneyManager.subMoney(currentBet / 2)
+          playerturn = false
+          insurance = true
         }
       }
     }
@@ -535,6 +553,10 @@ function play (autoplay) {
       console.log('Dealer has a Blackjack! Dealer wins!')
       stats.addLoss()
       stats.addBlackjack()
+      if (insurance && dealerHand.length === 2) {
+        console.log('You win your insurance bet back!')
+        moneyManager.addMoney(currentBet / 2)
+      }
     } else if (dealerHand.length === 5 && calcHand(dealerHand) < 21 && calcHand(playerHand) !== 21 && playerHand.length < 5) {
       // Dealer has 5 cards and player doesn't
       console.log('Dealer has 5 cards! Dealer wins!')
@@ -637,6 +659,8 @@ while (menu !== 'x') {
       console.log('The value of a hand is the sum of the card values. Players are allowed to draw additional cards to improve their hands.')
       console.log('At the start of the game, the dealer gives the player two cards face up. The dealer then gives himself two cards, one face up and one face down.')
       console.log('If a player\'s first two cards are an ace and a "ten-card" (a picture card or 10), giving a count of 21 in two cards, this is a natural or "blackjack".')
+      console.log('If the dealer\'s face-up card is an ace, the player is offered the option of taking "insurance" before the dealer checks the hole card.')
+      console.log('Insurance is a side bet that the dealer has blackjack and is treated independently of the main wager. It pays 2:1.')
       console.log('It is up to each individual player if an ace is worth 1 or 11. Face cards are 10 and any other card is its pip value.')
       console.log('Each turn, the player decides whether to hit (take another card) or stand (take no more cards).')
       console.log('You can draw cards by pressing H, stand by pressing S and show both hands by pressing C.')
