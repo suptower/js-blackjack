@@ -455,7 +455,7 @@ function play (autoplay) {
           action = autodecide(playerHand, dealerHand)
         } else {
           let actionOptions = ['Hit', 'Stand', 'Show hands']
-          if (playerHand.length === 2 && containsAce(dealerHand)) {
+          if (playerHand.length === 2 && dealerHand[0].rank === 'A') {
             actionOptions = ['Hit', 'Stand', 'Show hands', 'Insurance']
           }
           action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', { cancel: false })
