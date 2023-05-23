@@ -442,7 +442,7 @@ function play (autoplay) {
     let playerturn = true
     let dealerturn = false
     while (playerturn) {
-      if ((calcHand(playerHand) === 21) || (playerHand.length === 5 && (calcHand(playerHand) < 21 || calcHand(playerHand) > 21))) {
+      if (calcHand(playerHand) === 21 || (playerHand.length === 5 && calcHand(playerHand) < 21) || calcHand(playerHand) > 21) {
         playerturn = false
         dealerturn = true
         sleep(500)
