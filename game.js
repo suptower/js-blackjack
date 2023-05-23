@@ -388,6 +388,16 @@ function containsAce (hand) {
   return false
 }
 
+// Check if hand has two identical cards
+function isPair (hand) {
+  if (hand.length === 2) {
+    if (hand[0].rank === hand[1].rank) {
+      return true
+    }
+  }
+  return false
+}
+
 // Start game
 function play (autoplay) {
   moneyManager.setMoney(moneyManager.getStartMoney())
@@ -451,16 +461,29 @@ function play (autoplay) {
         console.log('----------------------------------')
         // Ask player for action or autoplay
         let action = 0
+        const actionOptions = ['Hit', 'Stand', 'Show hands']
         if (autoplay) {
           action = autodecide(playerHand, dealerHand)
         } else {
-          let actionOptions = ['Hit', 'Stand', 'Show hands']
-          if (playerHand.length === 2 && dealerHand[0].rank === 'A') {
-            actionOptions = ['Hit', 'Stand', 'Show hands', 'Insurance']
+          if (playerHand.length === 2) {
+            // Check for further actions
+            // Check for insurance
+            if (dealerHand[0].rank === 'A') {
+              actionOptions.push('Insurance')
+            }
+            // Check for double down
+            if (moneyManager.getMoney() >= currentBet) {
+              actionOptions.push('Double down')
+            }
+            // Check if player can split
+            if (isPair(playerHand)) {
+              // Needs further work, not planned right now
+              // actionOptions.push('Split')
+            }
           }
           action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', { cancel: false })
         }
-        if (action === 0) {
+        if (actionOptions[action] === 'Hit') {
           console.clear()
           console.log('You are drawing a card...')
           sleep(1300)
@@ -473,13 +496,13 @@ function play (autoplay) {
           sleep(500)
           console.log('Visible Dealer card:')
           printCard(dealerHand[0])
-        } else if (action === 1) {
+        } else if (actionOptions[action] === 'Stand') {
           playerturn = false
           dealerturn = true
           console.clear()
           console.log('You stand with a hand value of: ' + calcHand(playerHand))
           sleep(1000)
-        } else if (action === 2) {
+        } else if (actionOptions[action] === 'Show hands') {
           console.clear()
           console.log('Showing hands...')
           sleep(1000)
@@ -487,7 +510,7 @@ function play (autoplay) {
           printHand(playerHand)
           console.log('Visible Dealer card:')
           printCard(dealerHand[0])
-        } else if (action === 3) {
+        } else if (actionOptions[action] === 'Insurance') {
           console.clear()
           let insuranceBet = 0
           if (currentBet / 2 > moneyManager.getMoney()) {
@@ -500,6 +523,23 @@ function play (autoplay) {
           moneyManager.subMoney(currentBet / 2)
           playerturn = false
           insurance = true
+        } else if (actionOptions[action] === 'Double down') {
+          console.clear()
+          console.log('You double down for ' + currentBet + '€')
+          sleep(1000)
+          moneyManager.subMoney(currentBet)
+          currentBet = currentBet * 2
+          playerHand.push(drawCard(deck))
+          console.log('You draw:')
+          printCard(playerHand[playerHand.length - 1])
+          sleep(500)
+          console.log('Your hand:')
+          printHand(playerHand)
+          sleep(500)
+          console.log('Visible Dealer card:')
+          printCard(dealerHand[0])
+          playerturn = false
+          dealerturn = true
         }
       }
     }
