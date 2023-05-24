@@ -320,7 +320,7 @@ function printEnd (playerHand, dealerHand) {
   console.log('Dealer total was: ' + calcHand(dealerHand))
 }
 
-// Automatically play game by using blackjack strategy, return 0 => Hit, 1 => Stand
+// Automatically play game by using blackjack strategy, return 0 = Hit, 1 = Stand, 2 = Show hands, 3 = Insurance, 4 = Double down
 function autodecide (playerHand, dealerHand) {
   sleep(1000)
   console.log('Autoplaying...')
@@ -333,12 +333,18 @@ function autodecide (playerHand, dealerHand) {
       case 15:
       case 16:
       case 17:
-        return 0
+        if (dealerHand[0].value === 4 || dealerHand[0].value === 5 || dealerHand[0].value === 6) {
+          return 4
+        } else {
+          return 0
+        }
       case 18:
         if (dealerHand[0].value === 9 || dealerHand[0].value === 10 || dealerHand[0].value === 11) {
           return 0
-        } else {
+        } else if (dealerHand[0].value === 2 || dealerHand[0].value === 7 || dealerHand[0].value === 8) {
           return 1
+        } else {
+          return 4
         }
       default:
         return 1
@@ -353,8 +359,22 @@ function autodecide (playerHand, dealerHand) {
       case 6:
       case 7:
       case 8:
+        return 0
       case 9:
+        if (dealerHand[0].value === 3 || dealerHand[0].value === 4 || dealerHand[0].value === 5 || dealerHand[0].value === 6) { 
+          return 4
+        } else {
+          return 0
+        }
       case 10:
+        if (playerHand.length === 2 && isPair(playerHand) && (dealerHand[0].value >= 2 && dealerHand[0].value <= 6)) {
+          // Hand is 5,5 and dealer between 2 and 6
+          return 4
+        } else if (dealerHand[0].value === 10 || dealerHand[0].value === 11) {
+          return 0
+        } else {
+          return 4
+        }
       case 11:
         return 0
       case 12:
@@ -461,6 +481,7 @@ function play (autoplay) {
         console.log('----------------------------------')
         // Ask player for action or autoplay
         let action = 0
+        // 0 = Hit, 1 = Stand, 2 = Show hands, 3 = Insurance, 4 = Double down
         const actionOptions = ['Hit', 'Stand', 'Show hands']
         if (autoplay) {
           action = autodecide(playerHand, dealerHand)
@@ -482,8 +503,28 @@ function play (autoplay) {
             }
           }
           action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', { cancel: false })
+          switch (actionOptions[action]) {
+            case 'Hit':
+              action = 0
+              break
+            case 'Stand':
+              action = 1
+              break
+            case 'Show hands':
+              action = 2
+              break
+            case 'Insurance':
+              action = 3
+              break
+            case 'Double down':
+              action = 4
+              break
+            default:
+              action = 1
+              break
+          }
         }
-        if (actionOptions[action] === 'Hit') {
+        if (action === 0) {
           console.clear()
           console.log('You are drawing a card...')
           sleep(1300)
@@ -496,13 +537,13 @@ function play (autoplay) {
           sleep(500)
           console.log('Visible Dealer card:')
           printCard(dealerHand[0])
-        } else if (actionOptions[action] === 'Stand') {
+        } else if (action === 1) {
           playerturn = false
           dealerturn = true
           console.clear()
           console.log('You stand with a hand value of: ' + calcHand(playerHand))
           sleep(1000)
-        } else if (actionOptions[action] === 'Show hands') {
+        } else if (action === 2) {
           console.clear()
           console.log('Showing hands...')
           sleep(1000)
@@ -510,7 +551,7 @@ function play (autoplay) {
           printHand(playerHand)
           console.log('Visible Dealer card:')
           printCard(dealerHand[0])
-        } else if (actionOptions[action] === 'Insurance') {
+        } else if (action === 3) {
           console.clear()
           let insuranceBet = 0
           if (currentBet / 2 > moneyManager.getMoney()) {
@@ -523,7 +564,7 @@ function play (autoplay) {
           moneyManager.subMoney(currentBet / 2)
           playerturn = false
           insurance = true
-        } else if (actionOptions[action] === 'Double down') {
+        } else if (action === 4) {
           console.clear()
           console.log('You double down for ' + currentBet + '€')
           sleep(1000)
