@@ -323,7 +323,6 @@ function printEnd (playerHand, dealerHand) {
 // Automatically play game by using blackjack strategy, return 0 = Hit, 1 = Stand, 2 = Show hands, 3 = Insurance, 4 = Double down
 function autodecide (playerHand, dealerHand) {
   sleep(1000)
-  console.log('Autoplaying...')
   // Check if player has only two cards
   if (playerHand.length === 2 && containsAce(playerHand)) {
     switch (calcHand(playerHand)) {
@@ -361,7 +360,7 @@ function autodecide (playerHand, dealerHand) {
       case 8:
         return 0
       case 9:
-        if (dealerHand[0].value === 3 || dealerHand[0].value === 4 || dealerHand[0].value === 5 || dealerHand[0].value === 6) { 
+        if (dealerHand[0].value === 3 || dealerHand[0].value === 4 || dealerHand[0].value === 5 || dealerHand[0].value === 6) {
           return 4
         } else {
           return 0
@@ -482,8 +481,10 @@ function play (autoplay) {
         // Ask player for action or autoplay
         let action = 0
         // 0 = Hit, 1 = Stand, 2 = Show hands, 3 = Insurance, 4 = Double down
-        const actionOptions = ['Hit', 'Stand', 'Show hands']
+        const actionOptions = ['Hit', 'Stand', 'Show hands', 'Clue']
         if (autoplay) {
+          console.log('Autoplaying...')
+          sleep(250)
           action = autodecide(playerHand, dealerHand)
         } else {
           if (playerHand.length === 2) {
@@ -518,6 +519,9 @@ function play (autoplay) {
               break
             case 'Double down':
               action = 4
+              break
+            case 'Clue':
+              action = 5
               break
             default:
               action = 1
@@ -581,6 +585,30 @@ function play (autoplay) {
           printCard(dealerHand[0])
           playerturn = false
           dealerturn = true
+        } else if (action === 5) {
+          console.clear()
+          const clue = autodecide(playerHand, dealerHand)
+          switch (clue) {
+            case 0:
+              console.log('Recommended action based on your hand and the visible dealer card: Hit')
+              break
+            case 1:
+              console.log('Recommended action based on your hand and the visible dealer card: Stand')
+              break
+            case 4:
+              console.log('Recommended action based on your hand and the visible dealer card: Double Down')
+              break
+            default:
+              console.log('Recommended action based on your hand and the visible dealer card: Hit')
+              break
+          }
+          sleep(1000)
+          console.log('Showing hands...')
+          sleep(1000)
+          console.log('Your hand:')
+          printHand(playerHand)
+          console.log('Visible Dealer card:')
+          printCard(dealerHand[0])
         }
       }
     }
@@ -681,10 +709,8 @@ function play (autoplay) {
       game = true
     }
   }
-  sleep(500)
+  sleep(50)
   console.clear()
-  console.log('Going back to main menu...')
-  sleep(1000)
   menu = 'h'
 }
 
