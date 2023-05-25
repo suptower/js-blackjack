@@ -1,3 +1,6 @@
+// Terminal styling
+const chalk = require('chalk')
+
 // Prompt for user input
 const readlineSync = require('readline-sync')
 
@@ -59,18 +62,18 @@ function shuffle (iterations) {
 
 // Print a single card
 function printCard (card) {
-  console.log('-----------')
-  console.log('| ' + getSymbol(card.suit) + '       |')
-  console.log('|         |')
+  console.log(chalk.white('-----------'))
+  console.log(chalk.white('| ') + getSymbol(card.suit) + chalk.white('       |'))
+  console.log(chalk.white('|         |'))
   if (card.rank === '10') {
     // Padding has to be adapted for 10
-    console.log('|    ' + card.rank + '   |')
+    console.log(chalk.white('|    ') + getRank(card) + chalk.white('   |'))
   } else {
-    console.log('|    ' + card.rank + '    |')
+    console.log(chalk.white('|    ') + getRank(card) + chalk.white('    |'))
   }
-  console.log('|         |')
-  console.log('|       ' + getSymbol(card.suit) + ' |')
-  console.log('-----------')
+  console.log(chalk.white('|         |'))
+  console.log(chalk.white('|       ') + getSymbol(card.suit) + chalk.white(' |'))
+  console.log(chalk.white('-----------'))
 }
 
 // Draw cards from deck
@@ -89,13 +92,27 @@ function drawCard (deck) {
 function getSymbol (suit) {
   switch (suit) {
     case 'Herz':
-      return '♥'
+      return chalk.red('♥')
     case 'Pik':
-      return '♠'
+      return chalk.black('♠')
     case 'Kreuz':
-      return '♣'
+      return chalk.black('♣')
     case 'Karo':
-      return '♦'
+      return chalk.red('♦')
+  }
+}
+
+// Auxiliary function to get colored rank
+function getRank (card) {
+  switch (card.suit) {
+    case 'Herz':
+      return chalk.red(card.rank)
+    case 'Pik':
+      return chalk.black(card.rank)
+    case 'Kreuz':
+      return chalk.black(card.rank)
+    case 'Karo':
+      return chalk.red(card.rank)
   }
 }
 
@@ -119,18 +136,18 @@ function calcHand (hand) {
 function printHand (hand) {
   const output = ['', '', '', '', '', '', '']
   for (const card of hand) {
-    output[0] += '----------- '
-    output[1] += '| ' + getSymbol(card.suit) + '       | '
-    output[2] += '|         | '
+    output[0] += chalk.white('-----------')
+    output[1] += chalk.white('| ') + getSymbol(card.suit) + chalk.white('       |')
+    output[2] += chalk.white('|         |')
     if (card.rank === '10') {
       // Padding has to be adapted for 10
-      output[3] += '|    ' + card.rank + '   | '
+      output[3] += chalk.white('|    ') + getRank(card) + chalk.white('   |')
     } else {
-      output[3] += '|    ' + card.rank + '    | '
+      output[3] += chalk.white('|    ') + getRank(card) + chalk.white('    |')
     }
-    output[4] += '|         | '
-    output[5] += '|       ' + getSymbol(card.suit) + ' | '
-    output[6] += '----------- '
+    output[4] += chalk.white('|         |')
+    output[5] += chalk.white('|       ') + getSymbol(card.suit) + chalk.white(' |')
+    output[6] += chalk.white('-----------')
   }
   for (const line of output) {
     console.log(line)
