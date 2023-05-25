@@ -1,11 +1,12 @@
 {
 	"name": "blackjack",
-	"version": "1.4.2",
+	"version": "1.4.4",
 	"description": "",
 	"date": "Updated on 25th of May, 2023.",
 	"main": "game.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"release": "standard-version"
 	},
 	"keywords": [
 		"blackjack"
@@ -20,6 +21,7 @@
 		"eslint-config-standard": "^17.0.0",
 		"eslint-plugin-import": "^2.27.5",
 		"eslint-plugin-n": "^15.7.0",
-		"eslint-plugin-promise": "^6.1.1"
+		"eslint-plugin-promise": "^6.1.1",
+		"standard-version": "^9.5.0"
 	}
 }
