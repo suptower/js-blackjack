@@ -633,7 +633,7 @@ function play (autoplay) {
     console.clear()
     // WIN CONDITIONS
     // Blackjack pays 3:2, other wins pay 1:1, Tie returns bet
-    if (calcHand(playerHand) === 21 && calcHand(dealerHand) !== 21) {
+    if (calcHand(playerHand) === 21 && calcHand(dealerHand) !== 21 && dealerHand.length !== 5) {
       // Player has blackjack or dealer doesn't
       console.log('You have a Blackjack! You win!')
       stats.addWin()
@@ -657,7 +657,7 @@ function play (autoplay) {
       console.log('You won ' + currentBet * 2 + '!')
       moneyManager.addMoney(currentBet * 2)
       moneyManager.setDidWin(true)
-    } else if (calcHand(dealerHand) === 21 && calcHand(playerHand) !== 21) {
+    } else if (calcHand(dealerHand) === 21 && calcHand(playerHand) !== 21 && playerHand.length !== 5 && calcHand(playerHand) < 21) {
       // Dealer has blackjack and player doesn't
       console.log('Dealer has a Blackjack! Dealer wins!')
       stats.addLoss()
