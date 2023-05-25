@@ -493,12 +493,12 @@ function play (autoplay) {
         dealerturn = true
         sleep(500)
       } else {
-        console.log('Your hand value: ' + calcHand(playerHand) + ' | Dealer hand value: ' + dealerHand[0].value)
+        console.log('Your hand value: ' + chalk.green(calcHand(playerHand)) + ' | Dealer hand value: ' + chalk.green(dealerHand[0].value))
         console.log('----------------------------------')
         // Ask player for action or autoplay
         let action = 0
         // 0 = Hit, 1 = Stand, 2 = Show hands, 3 = Insurance, 4 = Double down
-        const actionOptions = ['Hit', 'Stand', 'Show hands', 'Clue']
+        const actionOptions = [chalk.green('Hit'), chalk.red('Stand'), chalk.blue('Show hands'), chalk.magenta('Clue')]
         if (autoplay) {
           console.log('Autoplaying...')
           sleep(250)
@@ -508,11 +508,11 @@ function play (autoplay) {
             // Check for further actions
             // Check for insurance
             if (dealerHand[0].rank === 'A') {
-              actionOptions.push('Insurance')
+              actionOptions.push(chalk.bgRed.white('Insurance'))
             }
             // Check for double down
             if (moneyManager.getMoney() >= currentBet) {
-              actionOptions.push('Double down')
+              actionOptions.push(chalk.blue('Double down'))
             }
             // Check if player can split
             if (isPair(playerHand)) {
