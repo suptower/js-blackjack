@@ -457,7 +457,7 @@ function play (autoplay) {
     if (autoplay) {
       currentBet = moneyManager.getNextBet()
     } else {
-      console.log('You have ' + moneyManager.getMoney() + '€')
+      console.log('You have ' + chalk.green(moneyManager.getMoney() + '€'))
       currentBet = readlineSync.questionInt('Place your bet (2 - ' + moneyManager.getMoney() + '): ')
       while (currentBet < 2 || currentBet > moneyManager.getMoney()) {
         console.log('Invalid bet!')
@@ -493,7 +493,7 @@ function play (autoplay) {
         dealerturn = true
         sleep(500)
       } else {
-        console.log('Your hand value: ' + chalk.green(calcHand(playerHand)) + ' | Dealer hand value: ' + chalk.green(dealerHand[0].value))
+        console.log('Your hand value: ' + chalk.green(calcHand(playerHand)) + ' | Dealer hand value: ' + chalk.yellow(dealerHand[0].value))
         console.log('----------------------------------')
         // Ask player for action or autoplay
         let action = 0
@@ -522,22 +522,22 @@ function play (autoplay) {
           }
           action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', { cancel: false })
           switch (actionOptions[action]) {
-            case 'Hit':
+            case chalk.green('Hit'):
               action = 0
               break
-            case 'Stand':
+            case chalk.red('Stand'):
               action = 1
               break
-            case 'Show hands':
+            case chalk.blue('Show hands'):
               action = 2
               break
-            case 'Insurance':
+            case chalk.bgRed.white('Insurance'):
               action = 3
               break
-            case 'Double down':
+            case chalk.blue('Double down'):
               action = 4
               break
-            case 'Clue':
+            case chalk.magenta('Clue'):
               action = 5
               break
             default:
@@ -607,16 +607,16 @@ function play (autoplay) {
           const clue = autodecide(playerHand, dealerHand)
           switch (clue) {
             case 0:
-              console.log('Recommended action based on your hand and the visible dealer card: Hit')
+              console.log('Recommended action based on your hand and the visible dealer card: ' + chalk.green('Hit'))
               break
             case 1:
-              console.log('Recommended action based on your hand and the visible dealer card: Stand')
+              console.log('Recommended action based on your hand and the visible dealer card: ' + chalk.red('Stand'))
               break
             case 4:
-              console.log('Recommended action based on your hand and the visible dealer card: Double Down')
+              console.log('Recommended action based on your hand and the visible dealer card: ' + chalk.blue('Double down'))
               break
             default:
-              console.log('Recommended action based on your hand and the visible dealer card: Hit')
+              console.log('Recommended action based on your hand and the visible dealer card: ' + chalk.red('Stand'))
               break
           }
           sleep(1000)
