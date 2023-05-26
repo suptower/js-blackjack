@@ -1,3 +1,6 @@
+// Terminal styling
+const chalk = require('chalk')
+
 // Prompt for user input
 const readlineSync = require('readline-sync')
 
@@ -59,18 +62,18 @@ function shuffle (iterations) {
 
 // Print a single card
 function printCard (card) {
-  console.log('-----------')
-  console.log('| ' + getSymbol(card.suit) + '       |')
-  console.log('|         |')
+  console.log(chalk.bgWhite.white('-----------'))
+  console.log(chalk.bgWhite.white('| ') + getSymbol(card.suit) + chalk.bgWhite.white('       |'))
+  console.log(chalk.bgWhite.white('|         |'))
   if (card.rank === '10') {
     // Padding has to be adapted for 10
-    console.log('|    ' + card.rank + '   |')
+    console.log(chalk.bgWhite.white('|    ') + getRank(card) + chalk.bgWhite.white('   |'))
   } else {
-    console.log('|    ' + card.rank + '    |')
+    console.log(chalk.bgWhite.white('|    ') + getRank(card) + chalk.bgWhite.white('    |'))
   }
-  console.log('|         |')
-  console.log('|       ' + getSymbol(card.suit) + ' |')
-  console.log('-----------')
+  console.log(chalk.bgWhite.white('|         |'))
+  console.log(chalk.bgWhite.white('|       ') + getSymbol(card.suit) + chalk.bgWhite.white(' |'))
+  console.log(chalk.bgWhite.white('-----------'))
 }
 
 // Draw cards from deck
@@ -89,13 +92,27 @@ function drawCard (deck) {
 function getSymbol (suit) {
   switch (suit) {
     case 'Herz':
-      return '♥'
+      return chalk.bgWhite.red('♥')
     case 'Pik':
-      return '♠'
+      return chalk.bgWhite.black('♠')
     case 'Kreuz':
-      return '♣'
+      return chalk.bgWhite.black('♣')
     case 'Karo':
-      return '♦'
+      return chalk.bgWhite.red('♦')
+  }
+}
+
+// Auxiliary function to get colored rank
+function getRank (card) {
+  switch (card.suit) {
+    case 'Herz':
+      return chalk.bgWhite.red(card.rank)
+    case 'Pik':
+      return chalk.bgWhite.black(card.rank)
+    case 'Kreuz':
+      return chalk.bgWhite.black(card.rank)
+    case 'Karo':
+      return chalk.bgWhite.red(card.rank)
   }
 }
 
@@ -119,18 +136,18 @@ function calcHand (hand) {
 function printHand (hand) {
   const output = ['', '', '', '', '', '', '']
   for (const card of hand) {
-    output[0] += '----------- '
-    output[1] += '| ' + getSymbol(card.suit) + '       | '
-    output[2] += '|         | '
+    output[0] += chalk.bgWhite.white('-----------')
+    output[1] += chalk.bgWhite.white('| ') + getSymbol(card.suit) + chalk.bgWhite.white('       |')
+    output[2] += chalk.bgWhite.white('|         |')
     if (card.rank === '10') {
       // Padding has to be adapted for 10
-      output[3] += '|    ' + card.rank + '   | '
+      output[3] += chalk.bgWhite.white('|    ') + getRank(card) + chalk.bgWhite.white('   |')
     } else {
-      output[3] += '|    ' + card.rank + '    | '
+      output[3] += chalk.bgWhite.white('|    ') + getRank(card) + chalk.bgWhite.white('    |')
     }
-    output[4] += '|         | '
-    output[5] += '|       ' + getSymbol(card.suit) + ' | '
-    output[6] += '----------- '
+    output[4] += chalk.bgWhite.white('|         |')
+    output[5] += chalk.bgWhite.white('|       ') + getSymbol(card.suit) + chalk.bgWhite.white(' |')
+    output[6] += chalk.bgWhite.white('-----------')
   }
   for (const line of output) {
     console.log(line)
@@ -440,7 +457,7 @@ function play (autoplay) {
     if (autoplay) {
       currentBet = moneyManager.getNextBet()
     } else {
-      console.log('You have ' + moneyManager.getMoney() + '€')
+      console.log('You have ' + chalk.green(moneyManager.getMoney() + '€'))
       currentBet = readlineSync.questionInt('Place your bet (2 - ' + moneyManager.getMoney() + '): ')
       while (currentBet < 2 || currentBet > moneyManager.getMoney()) {
         console.log('Invalid bet!')
@@ -476,12 +493,12 @@ function play (autoplay) {
         dealerturn = true
         sleep(500)
       } else {
-        console.log('Your hand value: ' + calcHand(playerHand) + ' | Dealer hand value: ' + dealerHand[0].value)
+        console.log('Your hand value: ' + chalk.green(calcHand(playerHand)) + ' | Dealer hand value: ' + chalk.yellow(dealerHand[0].value))
         console.log('----------------------------------')
         // Ask player for action or autoplay
         let action = 0
         // 0 = Hit, 1 = Stand, 2 = Show hands, 3 = Insurance, 4 = Double down
-        const actionOptions = ['Hit', 'Stand', 'Show hands', 'Clue']
+        const actionOptions = [chalk.green('Hit'), chalk.red('Stand'), chalk.blue('Show hands'), chalk.magenta('Clue')]
         if (autoplay) {
           console.log('Autoplaying...')
           sleep(250)
@@ -491,11 +508,11 @@ function play (autoplay) {
             // Check for further actions
             // Check for insurance
             if (dealerHand[0].rank === 'A') {
-              actionOptions.push('Insurance')
+              actionOptions.push(chalk.bgRed.white('Insurance'))
             }
             // Check for double down
             if (moneyManager.getMoney() >= currentBet) {
-              actionOptions.push('Double down')
+              actionOptions.push(chalk.blue('Double down'))
             }
             // Check if player can split
             if (isPair(playerHand)) {
@@ -505,22 +522,22 @@ function play (autoplay) {
           }
           action = readlineSync.keyInSelect(actionOptions, 'What do you want to do?', { cancel: false })
           switch (actionOptions[action]) {
-            case 'Hit':
+            case chalk.green('Hit'):
               action = 0
               break
-            case 'Stand':
+            case chalk.red('Stand'):
               action = 1
               break
-            case 'Show hands':
+            case chalk.blue('Show hands'):
               action = 2
               break
-            case 'Insurance':
+            case chalk.bgRed.white('Insurance'):
               action = 3
               break
-            case 'Double down':
+            case chalk.blue('Double down'):
               action = 4
               break
-            case 'Clue':
+            case chalk.magenta('Clue'):
               action = 5
               break
             default:
@@ -590,16 +607,16 @@ function play (autoplay) {
           const clue = autodecide(playerHand, dealerHand)
           switch (clue) {
             case 0:
-              console.log('Recommended action based on your hand and the visible dealer card: Hit')
+              console.log('Recommended action based on your hand and the visible dealer card: ' + chalk.green('Hit'))
               break
             case 1:
-              console.log('Recommended action based on your hand and the visible dealer card: Stand')
+              console.log('Recommended action based on your hand and the visible dealer card: ' + chalk.red('Stand'))
               break
             case 4:
-              console.log('Recommended action based on your hand and the visible dealer card: Double Down')
+              console.log('Recommended action based on your hand and the visible dealer card: ' + chalk.blue('Double down'))
               break
             default:
-              console.log('Recommended action based on your hand and the visible dealer card: Hit')
+              console.log('Recommended action based on your hand and the visible dealer card: ' + chalk.red('Stand'))
               break
           }
           sleep(1000)
