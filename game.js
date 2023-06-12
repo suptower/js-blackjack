@@ -441,6 +441,7 @@ function play (autoplay) {
   let game = true
   let currentBet = 0
   let insurance = false
+  let surrender = false
   getDeck(stackSize)
   shuffle(1000)
   while (game) {
@@ -506,9 +507,11 @@ function play (autoplay) {
         } else {
           if (playerHand.length === 2) {
             // Check for further actions
+            // Surrender only possible on first turn
+            actionOptions.push(chalk.bgRed.white('Surrender'))
             // Check for insurance
             if (dealerHand[0].rank === 'A') {
-              actionOptions.push(chalk.bgRed.white('Insurance'))
+              actionOptions.push(chalk.yellow('Insurance'))
             }
             // Check for double down
             if (moneyManager.getMoney() >= currentBet) {
@@ -531,7 +534,7 @@ function play (autoplay) {
             case chalk.blue('Show hands'):
               action = 2
               break
-            case chalk.bgRed.white('Insurance'):
+            case chalk.yellow('Insurance'):
               action = 3
               break
             case chalk.blue('Double down'):
@@ -539,6 +542,9 @@ function play (autoplay) {
               break
             case chalk.magenta('Clue'):
               action = 5
+              break
+            case chalk.bgRed.white('Surrender'):
+              action = 6
               break
             default:
               action = 1
@@ -626,6 +632,10 @@ function play (autoplay) {
           printHand(playerHand)
           console.log('Visible Dealer card:')
           printCard(dealerHand[0])
+        } else if (action === 6) {
+          playerturn = false
+          dealerturn = false
+          surrender = true
         }
       }
     }
@@ -650,7 +660,14 @@ function play (autoplay) {
     console.clear()
     // WIN CONDITIONS
     // Blackjack pays 3:2, other wins pay 1:1, Tie returns bet
-    if (calcHand(playerHand) === 21 && calcHand(dealerHand) !== 21 && dealerHand.length !== 5) {
+    if (surrender) {
+      // Player surrendered
+      surrender = false
+      console.clear()
+      console.log('You surrender and get half your bet back')
+      sleep(1000)
+      moneyManager.addMoney(currentBet / 2)
+    } else if (calcHand(playerHand) === 21 && calcHand(dealerHand) !== 21 && dealerHand.length !== 5) {
       // Player has blackjack or dealer doesn't
       console.log('You have a Blackjack! You win!')
       stats.addWin()
