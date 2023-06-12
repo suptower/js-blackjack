@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/suptower/js-blackjack/compare/v1.5.0...v1.6.0) (2023-06-12)
+
+
+### Features
+
+* **game:** added surrender action ([353c0d7](https://github.com/suptower/js-blackjack/commit/353c0d73224e473deed79ee631297bfddc9c9f41))
+
 ## [1.5.0](https://github.com/suptower/js-blackjack/compare/v1.4.2...v1.5.0) (2023-05-26)
 
 
