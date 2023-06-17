@@ -1,4 +1,4 @@
-const fs = require("fs");
+import fs from "fs";
 const dateTime = new Date();
 const day = dateTime.getDate();
 
