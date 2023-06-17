@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.2](https://github.com/suptower/js-blackjack/compare/v1.7.1...v1.7.2) (2023-06-17)
+
+
+### Bug Fixes
+
+* renamed package ([9d4a56e](https://github.com/suptower/js-blackjack/commit/9d4a56e3f7b21e7bae105714f3c97d35f64b0e56))
+
 ### [1.7.1](https://github.com/suptower/js-blackjack/compare/v1.7.0...v1.7.1) (2023-06-17)
 
 
