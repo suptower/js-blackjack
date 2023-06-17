@@ -9,3 +9,10 @@ Little JavaScript project testing GitHub Copilot and Node.js
   <img alt="Lines of Code" src="https://img.shields.io/tokei/lines/github/suptower/js-blackjack">
   <a href="https://app.codacy.com/gh/suptower/js-blackjack/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"><img src="https://app.codacy.com/project/badge/Grade/d85c5c9b3fc44a4ba83d08a0ba92e8b2"/></a>
 </p>
+
+## Playing
+
+To run the game, install the package, then:
+```
+node .
+```
