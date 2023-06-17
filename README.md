@@ -1,5 +1,7 @@
 # js-blackjack
+
 Little JavaScript project testing GitHub Copilot and Node.js
+
 <p align="center">
   <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/suptower/js-blackjack">
   <img alt="Github Code size" src="https://img.shields.io/github/languages/code-size/suptower/js-blackjack">

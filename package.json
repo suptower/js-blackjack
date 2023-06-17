@@ -1,28 +1,36 @@
 {
-	"name": "blackjack",
-	"version": "1.6.0",
-	"description": "",
-	"date": "Updated on 25th of May, 2023.",
-	"main": "game.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"release": "standard-version"
-	},
-	"keywords": [
-		"blackjack"
-	],
-	"author": "suptower",
-	"license": "MIT",
-	"dependencies": {
-		"chalk": "^4.1.2",
-		"readline-sync": "^1.4.10"
-	},
-	"devDependencies": {
-		"eslint": "^8.40.0",
-		"eslint-config-standard": "^17.0.0",
-		"eslint-plugin-import": "^2.27.5",
-		"eslint-plugin-n": "^15.7.0",
-		"eslint-plugin-promise": "^6.1.1",
-		"standard-version": "^9.5.0"
-	}
+  "name": "blackjack",
+  "version": "1.6.0",
+  "description": "",
+  "date": "Updated on 25th of May, 2023.",
+  "exports": "./index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "node updatePackageDate.js && standard-version",
+    "lint": "prettier --check . && eslint .",
+    "lint:fix": "prettier --write . && eslint . --fix"
+  },
+  "keywords": [
+    "blackjack"
+  ],
+  "author": "suptower",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "eslint-config-prettier": "^8.8.0",
+    "prettier": "^2.8.8",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "eslint": "^8.40.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "standard-version": "^9.5.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }
