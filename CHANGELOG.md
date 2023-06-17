@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/suptower/js-blackjack/compare/v1.7.0...v1.7.1) (2023-06-17)
+
+
+### Bug Fixes
+
+* make fs import ([68d4ca0](https://github.com/suptower/js-blackjack/commit/68d4ca08433df75753dfd3d59859e98dd254881e))
+
 ## [1.7.0](https://github.com/suptower/js-blackjack/compare/v1.6.0...v1.7.0) (2023-06-17)
 
 
