@@ -1,5 +1,4 @@
-const fs = require("fs");
-const exec = require("child_process").exec;
+import fs from "fs";
 const dateTime = new Date();
 const day = dateTime.getDate();
 
@@ -35,7 +34,7 @@ const yearString = dateTime.getFullYear().toString();
 const output = "Updated on " + dayString + " of " + monthString + ", " + yearString + ".";
 console.log(output);
 
-function updatePackageJson(_callback) {
+function updatePackageJson() {
   fs.readFile("./package.json", (err, data) => {
     if (err) throw err;
 
@@ -48,23 +47,6 @@ function updatePackageJson(_callback) {
       console.log("Date in package.json has been updated.");
     });
   });
-  _callback();
 }
 
-function commit() {
-  updatePackageJson(function () {
-    if (process.argv.length < 3) {
-      exec("npm version patch --no-git-tag-version && git add . && git commit && git push origin");
-    } else {
-      let gitcom = "";
-      for (const val of process.argv) {
-        if (val !== process.argv[0] && val !== process.argv[1]) {
-          gitcom += val + " ";
-        }
-      }
-      exec('npm version patch --no-git-tag-version && git add . && git commit -m "' + gitcom + '" && git push origin');
-    }
-  });
-}
-
-commit();
+updatePackageJson();
