@@ -5,9 +5,12 @@
 	"date": "Updated on 17th of June, 2023.",
 	"exports": "./index.js",
 	"type": "module",
+	"bin": {
+		"blackjack": "./index.js"
+	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"release": "node updatePackageDate.js && standard-version",
+		"release": "node updatePackageDate.js && commit-and-tag-version",
 		"lint": "prettier --check . && eslint .",
 		"lint:fix": "prettier --write . && eslint . --fix"
 	},
@@ -18,6 +21,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"chalk": "^5.2.0",
+		"commit-and-tag-version": "^11.2.2",
 		"eslint-config-prettier": "^8.8.0",
 		"prettier": "^2.8.8",
 		"readline-sync": "^1.4.10"
@@ -27,8 +31,7 @@
 		"eslint-config-standard": "^17.0.0",
 		"eslint-plugin-import": "^2.27.5",
 		"eslint-plugin-n": "^15.7.0",
-		"eslint-plugin-promise": "^6.1.1",
-		"standard-version": "^9.5.0"
+		"eslint-plugin-promise": "^6.1.1"
 	},
 	"engines": {
 		"node": ">=16.0.0"
