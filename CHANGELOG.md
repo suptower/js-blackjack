@@ -4,24 +4,21 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.7.2](https://github.com/suptower/js-blackjack/compare/v1.7.1...v1.7.2) (2023-06-17)
 
-
 ### Bug Fixes
 
-* renamed package ([9d4a56e](https://github.com/suptower/js-blackjack/commit/9d4a56e3f7b21e7bae105714f3c97d35f64b0e56))
+- renamed package ([9d4a56e](https://github.com/suptower/js-blackjack/commit/9d4a56e3f7b21e7bae105714f3c97d35f64b0e56))
 
 ### [1.7.1](https://github.com/suptower/js-blackjack/compare/v1.7.0...v1.7.1) (2023-06-17)
 
-
 ### Bug Fixes
 
-* make fs import ([68d4ca0](https://github.com/suptower/js-blackjack/commit/68d4ca08433df75753dfd3d59859e98dd254881e))
+- make fs import ([68d4ca0](https://github.com/suptower/js-blackjack/commit/68d4ca08433df75753dfd3d59859e98dd254881e))
 
 ## [1.7.0](https://github.com/suptower/js-blackjack/compare/v1.6.0...v1.7.0) (2023-06-17)
 
-
 ### Features
 
-* made package esm ([fd27ef6](https://github.com/suptower/js-blackjack/commit/fd27ef6694ba7e5fb2df7d132443da7996b1f7d7))
+- made package esm ([fd27ef6](https://github.com/suptower/js-blackjack/commit/fd27ef6694ba7e5fb2df7d132443da7996b1f7d7))
 
 ## [1.6.0](https://github.com/suptower/js-blackjack/compare/v1.5.0...v1.6.0) (2023-06-12)
 
