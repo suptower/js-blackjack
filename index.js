@@ -1,3 +1,4 @@
+#!/usr/bin/env node --no-warnings
 // Terminal styling
 import chalk from "chalk";
 
