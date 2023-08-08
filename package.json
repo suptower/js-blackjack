@@ -1,39 +1,39 @@
 {
-	"name": "@suptower/blackjack",
-	"version": "1.7.2",
-	"description": "",
-	"date": "Updated on 17th of June, 2023.",
-	"exports": "./bin/index.js",
-	"type": "module",
-	"bin": {
-		"blackjack": "./index.js"
-	},
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"release": "node updatePackageDate.js && commit-and-tag-version",
-		"lint": "prettier --check . && eslint .",
-		"lint:fix": "prettier --write . && eslint . --fix"
-	},
-	"keywords": [
-		"blackjack"
-	],
-	"author": "suptower",
-	"license": "MIT",
-	"dependencies": {
-		"chalk": "^5.2.0",
-		"commit-and-tag-version": "^11.2.2",
-		"eslint-config-prettier": "^8.8.0",
-		"prettier": "^2.8.8",
-		"readline-sync": "^1.4.10"
-	},
-	"devDependencies": {
-		"eslint": "^8.40.0",
-		"eslint-config-standard": "^17.0.0",
-		"eslint-plugin-import": "^2.27.5",
-		"eslint-plugin-n": "^15.7.0",
-		"eslint-plugin-promise": "^6.1.1"
-	},
-	"engines": {
-		"node": ">=16.0.0"
-	}
+  "name": "@suptower/blackjack",
+  "version": "1.7.2",
+  "description": "",
+  "date": "Updated on 17th of June, 2023.",
+  "exports": "./bin/index.js",
+  "type": "module",
+  "bin": {
+    "blackjack": "./bin/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "node updatePackageDate.js && commit-and-tag-version",
+    "lint": "prettier --check . && eslint .",
+    "lint:fix": "prettier --write . && eslint . --fix"
+  },
+  "keywords": [
+    "blackjack"
+  ],
+  "author": "suptower",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "commit-and-tag-version": "^11.2.2",
+    "eslint-config-prettier": "^8.8.0",
+    "prettier": "^2.8.8",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "eslint": "^8.40.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-promise": "^6.1.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }

@@ -13,6 +13,7 @@ Little JavaScript project testing GitHub Copilot and Node.js
 ## Playing
 
 To run the game, install the package, then:
+
 ```
 node .
 ```
