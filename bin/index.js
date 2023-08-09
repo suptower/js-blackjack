@@ -1,3 +1,4 @@
+#!/usr/bin/env node --no-warnings
 // Terminal styling
 import chalk from "chalk";
 
@@ -5,8 +6,15 @@ import chalk from "chalk";
 import readlineSync from "readline-sync";
 
 // Information data
-import { readFile } from "fs/promises";
-const { version, date } = JSON.parse(await readFile("./package.json"));
+import { readFileSync } from "fs";
+// use import.meta.url
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(path.join(__dirname, "../package.json"), "utf-8"));
+const version = packageJson.version;
+const date = packageJson.date;
 
 // Card contents
 const suits = ["Herz", "Pik", "Kreuz", "Karo"];
