@@ -1,5 +1,7 @@
 {
   "conventionalCommits.scopes": [
+    "deps",
+    "files",
     "deps"
   ]
 }

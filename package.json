@@ -3,7 +3,7 @@
 	"version": "1.7.2",
 	"description": "",
 	"date": "Updated on 17th of June, 2023.",
-	"exports": "./index.js",
+	"exports": "./bin/index.js",
 	"type": "module",
 	"bin": {
 		"blackjack": "./index.js"
