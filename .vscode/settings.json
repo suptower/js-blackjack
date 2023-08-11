@@ -2,6 +2,7 @@
   "conventionalCommits.scopes": [
     "deps",
     "files",
-    "deckHandler"
+    "deckHandler",
+    "moneyManager"
   ]
 }

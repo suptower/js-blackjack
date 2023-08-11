@@ -11,6 +11,9 @@ import Conf from "conf";
 // import functions from deckHandler.js
 import { DeckHandler } from "./deckHandler.js";
 
+// import functions from moneyManager.js
+import { MoneyManager } from "./moneyManager.js";
+
 // Information data
 import { readFileSync } from "fs";
 // use import.meta.url
@@ -36,6 +39,10 @@ const schema = {
 
 // Create a new conf instance
 const config = new Conf({ projectName: "blackjack", schema });
+
+const moneyManager = new MoneyManager();
+
+const deckHandler = new DeckHandler();
 
 // Wait function to delay execution
 function sleep(ms) {
@@ -204,102 +211,6 @@ class Stats {
 
 const stats = new Stats();
 
-// Class for managing money
-class MoneyManager {
-  constructor() {
-    this.money = 1000;
-    this.startMoney = config.get("startingMoney");
-    this.startBet = 0;
-    this.lastBet = 0;
-    this.didWin = false;
-  }
-
-  getMoney() {
-    return this.money;
-  }
-
-  getStartMoney() {
-    return this.startMoney;
-  }
-
-  getStartBet() {
-    return this.startBet;
-  }
-
-  getLastBet() {
-    return this.lastBet;
-  }
-
-  getDidWin() {
-    return this.didWin;
-  }
-
-  setMoney(money) {
-    this.money = money;
-  }
-
-  setStartMoney(startMoney) {
-    this.startMoney = startMoney;
-  }
-
-  setStartBet(startBet) {
-    this.startBet = startBet;
-  }
-
-  setLastBet(lastBet) {
-    this.lastBet = lastBet;
-  }
-
-  setDidWin(didWin) {
-    this.didWin = didWin;
-  }
-
-  addMoney(money) {
-    this.money += money;
-  }
-
-  subMoney(money) {
-    this.money -= money;
-  }
-
-  printMoney() {
-    console.log("You have " + this.money + "€.");
-  }
-
-  // Double the bet if lost, reset if won
-  getNextBet() {
-    if (this.getLastBet() === 0) {
-      return this.startBet;
-    }
-    if (this.didWin) {
-      this.didWin = false;
-      return this.startBet;
-    } else {
-      if (this.getLastBet() * 2 > this.getMoney()) {
-        return this.getMoney();
-      }
-      return this.getLastBet() * 2;
-    }
-  }
-
-  reset() {
-    this.money = this.startMoney;
-    this.startBet = 0;
-    this.lastBet = 0;
-    this.didWin = false;
-  }
-
-  // Unable to bet if money is less than 2
-  checkMoney() {
-    if (this.getMoney() < 2) {
-      return false;
-    }
-    return true;
-  }
-}
-
-const moneyManager = new MoneyManager();
-
 function printEnd(playerHand, dealerHand) {
   console.log("Game summary: (Game " + stats.getGames() + ")");
   console.log("Your hand was:");
@@ -426,8 +337,7 @@ function play(autoplay) {
   let currentBet = 0;
   let insurance = false;
   let surrender = false;
-  const deckInstance = new DeckHandler();
-  deckInstance.shuffle(1000);
+  deckHandler.shuffle(1000);
   while (game) {
     insurance = false;
     if (!moneyManager.checkMoney()) {
@@ -460,8 +370,8 @@ function play(autoplay) {
     sleep(1000);
     // Draw initial 2 cards for each player
     for (let i = 0; i < 2; i++) {
-      dealerHand.push(deckInstance.drawCard());
-      playerHand.push(deckInstance.drawCard());
+      dealerHand.push(deckHandler.drawCard());
+      playerHand.push(deckHandler.drawCard());
     }
     // Print cards
     console.log("Visible Dealer card:");
@@ -548,7 +458,7 @@ function play(autoplay) {
           console.clear();
           console.log("You are drawing a card...");
           sleep(1300);
-          playerHand.push(deckInstance.drawCard());
+          playerHand.push(deckHandler.drawCard());
           console.log("You draw:");
           printCard(playerHand[playerHand.length - 1]);
           sleep(500);
@@ -590,7 +500,7 @@ function play(autoplay) {
           sleep(1000);
           moneyManager.subMoney(currentBet);
           currentBet = currentBet * 2;
-          playerHand.push(deckInstance.drawCard());
+          playerHand.push(deckHandler.drawCard());
           console.log("You draw:");
           printCard(playerHand[playerHand.length - 1]);
           sleep(500);
@@ -646,7 +556,7 @@ function play(autoplay) {
         sleep(2000);
         console.clear();
         console.log("Dealer draws:");
-        dealerHand.push(deckInstance.drawCard());
+        dealerHand.push(deckHandler.drawCard());
         printCard(dealerHand[dealerHand.length - 1]);
         sleep(1000);
       }
