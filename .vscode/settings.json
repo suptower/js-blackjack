@@ -3,6 +3,7 @@
     "deps",
     "files",
     "deckHandler",
-    "moneyManager"
+    "moneyManager",
+    "stats"
   ]
 }
