@@ -5,6 +5,12 @@ import chalk from "chalk";
 // Prompt for user input
 import readlineSync from "readline-sync";
 
+// persist conf
+import Conf from "conf";
+
+// import functions from deckHandler.js
+import { DeckHandler } from "./deckHandler.js";
+
 // Information data
 import { readFileSync } from "fs";
 // use import.meta.url
@@ -16,56 +22,26 @@ const packageJson = JSON.parse(readFileSync(path.join(__dirname, "../package.jso
 const version = packageJson.version;
 const date = packageJson.date;
 
-// Card contents
-const suits = ["Herz", "Pik", "Kreuz", "Karo"];
-const ranks = ["A", "K", "D", "B", "10", "9", "8", "7", "6", "5", "4", "3", "2"];
-const values = [11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+// conf schema
+const schema = {
+  stackSize: {
+    type: "number",
+    default: 4,
+  },
+  startMoney: {
+    type: "number",
+    default: 1000,
+  },
+};
 
-// Create every possible combination of suit and rank
-const cards = [];
-
-// Deck
-const deck = [];
-
-// Define stack size, can be customized in main menu via options
-let stackSize = 4;
-
-// Create cards
-for (const suit of suits) {
-  let i = 0;
-  for (const rank of ranks) {
-    const value = values[i];
-    cards.push({ suit, rank, value });
-    i++;
-  }
-}
+// Create a new conf instance
+const config = new Conf({ projectName: "blackjack", schema });
 
 // Wait function to delay execution
 function sleep(ms) {
   const wakeUpTime = Date.now() + ms;
   while (Date.now() < wakeUpTime) {
     // This is blocking code
-  }
-}
-
-// Create a deck of multiple card sets
-function getDeck(stacks) {
-  for (let i = 0; i < stacks; i++) {
-    for (const card of cards) {
-      deck.push(card);
-    }
-  }
-}
-
-// Shuffle deck
-function shuffle(iterations) {
-  for (let i = 0; i < iterations; i++) {
-    for (let i = deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * i);
-      const temp = deck[i];
-      deck[i] = deck[j];
-      deck[j] = temp;
-    }
   }
 }
 
@@ -83,18 +59,6 @@ function printCard(card) {
   console.log(chalk.bgWhite.white("|         |"));
   console.log(chalk.bgWhite.white("|       ") + getSymbol(card.suit) + chalk.bgWhite.white(" |"));
   console.log(chalk.bgWhite.white("-----------"));
-}
-
-// Draw cards from deck
-function drawCard(deck) {
-  if (deck.length === 0) {
-    console.log("No more cards in deck!");
-    console.log("Shuffling deck...");
-    getDeck(stackSize);
-    shuffle(1000);
-    console.log("Deck has cards: +" + deck.length);
-  }
-  return deck.pop();
 }
 
 // Get symbol for card
@@ -244,7 +208,7 @@ const stats = new Stats();
 class MoneyManager {
   constructor() {
     this.money = 1000;
-    this.startMoney = 1000;
+    this.startMoney = config.get("startingMoney");
     this.startBet = 0;
     this.lastBet = 0;
     this.didWin = false;
@@ -462,8 +426,8 @@ function play(autoplay) {
   let currentBet = 0;
   let insurance = false;
   let surrender = false;
-  getDeck(stackSize);
-  shuffle(1000);
+  const deckInstance = new DeckHandler();
+  deckInstance.shuffle(1000);
   while (game) {
     insurance = false;
     if (!moneyManager.checkMoney()) {
@@ -496,8 +460,8 @@ function play(autoplay) {
     sleep(1000);
     // Draw initial 2 cards for each player
     for (let i = 0; i < 2; i++) {
-      dealerHand.push(drawCard(deck));
-      playerHand.push(drawCard(deck));
+      dealerHand.push(deckInstance.drawCard());
+      playerHand.push(deckInstance.drawCard());
     }
     // Print cards
     console.log("Visible Dealer card:");
@@ -584,7 +548,7 @@ function play(autoplay) {
           console.clear();
           console.log("You are drawing a card...");
           sleep(1300);
-          playerHand.push(drawCard(deck));
+          playerHand.push(deckInstance.drawCard());
           console.log("You draw:");
           printCard(playerHand[playerHand.length - 1]);
           sleep(500);
@@ -626,7 +590,7 @@ function play(autoplay) {
           sleep(1000);
           moneyManager.subMoney(currentBet);
           currentBet = currentBet * 2;
-          playerHand.push(drawCard(deck));
+          playerHand.push(deckInstance.drawCard());
           console.log("You draw:");
           printCard(playerHand[playerHand.length - 1]);
           sleep(500);
@@ -682,7 +646,7 @@ function play(autoplay) {
         sleep(2000);
         console.clear();
         console.log("Dealer draws:");
-        dealerHand.push(drawCard(deck));
+        dealerHand.push(deckInstance.drawCard());
         printCard(dealerHand[dealerHand.length - 1]);
         sleep(1000);
       }
@@ -930,14 +894,14 @@ while (menu !== "x") {
       switch (start) {
         case 0: {
           console.clear();
-          let newStackSize = readlineSync.questionInt("Enter new stack size (1-16) [DEFAULT: 4] : ");
+          let newStackSize = readlineSync.questionInt("Enter new stack size (1-16) [DEFAULT: 4 | CURRENT: " + config.get("stackSize") + "] : ");
           while (newStackSize < 1 || newStackSize > 16) {
             console.log("Invalid stack size. Please try again.");
-            newStackSize = readlineSync.questionInt("Enter new stack size (1-16) [DEFAULT: 4] : ");
+            newStackSize = readlineSync.questionInt("Enter new stack size (1-16) [DEFAULT: 4 | CURRENT: " + config.get("stackSize") + "] : ");
           }
           console.log("Changing stack size to " + newStackSize + "...");
           sleep(1000);
-          stackSize = newStackSize;
+          config.set("stackSize", newStackSize);
           console.log("Stack size changed!");
           sleep(1000);
           newStackSize = readlineSync.keyInPause("Press any key to go back to the main menu.");
@@ -956,13 +920,14 @@ while (menu !== "x") {
           break;
         case 2: {
           console.clear();
-          let newStartingMoney = readlineSync.questionInt("Enter new starting money (2-50.000) [DEFAULT: 1.000] : ");
+          let newStartingMoney = readlineSync.questionInt("Enter new starting money (2-50.000) [DEFAULT: 1.000 | CURRENT: " + config.get("startMoney") + "] : ");
           while (newStartingMoney < 2 || newStartingMoney > 50000) {
             console.log("Invalid starting money. Please try again.");
             newStartingMoney = readlineSync.questionInt("Enter new starting money (2-50.000) [DEFAULT: 1.000] : ");
           }
           console.log("Changing starting money to " + newStartingMoney + "...");
           sleep(1000);
+          config.set("startMoney", newStartingMoney);
           moneyManager.setStartMoney(newStartingMoney);
           console.log("Starting money changed!");
           sleep(1000);

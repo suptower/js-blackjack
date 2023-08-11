@@ -23,6 +23,7 @@
   "dependencies": {
     "chalk": "^5.2.0",
     "commit-and-tag-version": "^11.2.2",
+    "conf": "^11.0.2",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.8",
     "readline-sync": "^1.4.10"
