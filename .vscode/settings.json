@@ -5,6 +5,7 @@
     "deckHandler",
     "moneyManager",
     "stats",
-    "util"
+    "util",
+    "autodecide"
   ]
 }
