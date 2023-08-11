@@ -6,7 +6,7 @@ const config = new Conf({ projectName: "blackjack"});
 // Class for managing money
 export class MoneyManager {
   constructor() {
-    this.startMoney = config.get("startingMoney");
+    this.startMoney = config.get("startMoney");
     this.money = this.startMoney;
     this.startBet = 0;
     this.lastBet = 0;

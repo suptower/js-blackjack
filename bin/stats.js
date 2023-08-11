@@ -1,3 +1,5 @@
+import { sleep } from "./util.js";
+
 // Statistics class
 export class Stats {
   constructor() {

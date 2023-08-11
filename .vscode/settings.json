@@ -4,6 +4,7 @@
     "files",
     "deckHandler",
     "moneyManager",
-    "stats"
+    "stats",
+    "util"
   ]
 }
