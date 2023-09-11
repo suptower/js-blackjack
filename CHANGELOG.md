@@ -1,5 +1,23 @@
 # Changelog
 
+All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
+
+## [1.8.0](https://github.com/suptower/js-blackjack/compare/v1.7.1...v1.8.0) (2023-09-11)
+
+
+### Features
+
+* **autodecide:** :sparkles: implemented autodecide ([e0fd5b5](https://github.com/suptower/js-blackjack/commit/e0fd5b5ad67bcc19c09d9d91bf7bc3df07fb9ded))
+* **deckHandler:** :sparkles: implemented deckHandler ([1670416](https://github.com/suptower/js-blackjack/commit/1670416c28d49f0ecbd816a713c9f9ccae5c52c4))
+* **moneyManager:** :sparkles: implemented moneyManager ([d87729f](https://github.com/suptower/js-blackjack/commit/d87729f6c8792187c75b41ede1c02484467a4f15))
+* **stats:** :sparkles: implemented stats class ([4a23efb](https://github.com/suptower/js-blackjack/commit/4a23efb1883002e584c2318963101b0731cace06))
+* **util:** :sparkles: implemented util ([b3635ec](https://github.com/suptower/js-blackjack/commit/b3635ec353e883bfa780d65a46dfc08dc6ea0fb4))
+
+
+### Bug Fixes
+
+* renamed package ([9d4a56e](https://github.com/suptower/js-blackjack/commit/9d4a56e3f7b21e7bae105714f3c97d35f64b0e56))
+
 ### [1.7.2](https://github.com/suptower/js-blackjack/compare/v1.7.1...v1.7.2) (2023-06-17)
 
 ### Bug Fixes
