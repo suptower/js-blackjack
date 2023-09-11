@@ -1,3 +1,11 @@
 {
-  "conventionalCommits.scopes": ["deps", "files"]
+  "conventionalCommits.scopes": [
+    "deps",
+    "files",
+    "deckHandler",
+    "moneyManager",
+    "stats",
+    "util",
+    "autodecide"
+  ]
 }

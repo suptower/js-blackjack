@@ -5,6 +5,24 @@ import chalk from "chalk";
 // Prompt for user input
 import readlineSync from "readline-sync";
 
+// persist conf
+import Conf from "conf";
+
+// import functions from deckHandler.js
+import { DeckHandler } from "./deckHandler.js";
+
+// import functions from moneyManager.js
+import { MoneyManager } from "./moneyManager.js";
+
+// import functions from stats.js
+import { Stats } from "./stats.js";
+
+// import util functions
+import { Util } from "./util.js";
+
+// import autodecide
+import { autodecide } from "./autodecide.js";
+
 // Information data
 import { readFileSync } from "fs";
 // use import.meta.url
@@ -16,442 +34,37 @@ const packageJson = JSON.parse(readFileSync(path.join(__dirname, "../package.jso
 const version = packageJson.version;
 const date = packageJson.date;
 
-// Card contents
-const suits = ["Herz", "Pik", "Kreuz", "Karo"];
-const ranks = ["A", "K", "D", "B", "10", "9", "8", "7", "6", "5", "4", "3", "2"];
-const values = [11, 10, 10, 10, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+// conf schema
+const schema = {
+  stackSize: {
+    type: "number",
+    default: 4,
+  },
+  startMoney: {
+    type: "number",
+    default: 1000,
+  },
+};
 
-// Create every possible combination of suit and rank
-const cards = [];
+// Create a new conf instance
+const config = new Conf({ projectName: "blackjack", schema });
 
-// Deck
-const deck = [];
+const moneyManager = new MoneyManager();
 
-// Define stack size, can be customized in main menu via options
-let stackSize = 4;
-
-// Create cards
-for (const suit of suits) {
-  let i = 0;
-  for (const rank of ranks) {
-    const value = values[i];
-    cards.push({ suit, rank, value });
-    i++;
-  }
-}
-
-// Wait function to delay execution
-function sleep(ms) {
-  const wakeUpTime = Date.now() + ms;
-  while (Date.now() < wakeUpTime) {
-    // This is blocking code
-  }
-}
-
-// Create a deck of multiple card sets
-function getDeck(stacks) {
-  for (let i = 0; i < stacks; i++) {
-    for (const card of cards) {
-      deck.push(card);
-    }
-  }
-}
-
-// Shuffle deck
-function shuffle(iterations) {
-  for (let i = 0; i < iterations; i++) {
-    for (let i = deck.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * i);
-      const temp = deck[i];
-      deck[i] = deck[j];
-      deck[j] = temp;
-    }
-  }
-}
-
-// Print a single card
-function printCard(card) {
-  console.log(chalk.bgWhite.white("-----------"));
-  console.log(chalk.bgWhite.white("| ") + getSymbol(card.suit) + chalk.bgWhite.white("       |"));
-  console.log(chalk.bgWhite.white("|         |"));
-  if (card.rank === "10") {
-    // Padding has to be adapted for 10
-    console.log(chalk.bgWhite.white("|    ") + getRank(card) + chalk.bgWhite.white("   |"));
-  } else {
-    console.log(chalk.bgWhite.white("|    ") + getRank(card) + chalk.bgWhite.white("    |"));
-  }
-  console.log(chalk.bgWhite.white("|         |"));
-  console.log(chalk.bgWhite.white("|       ") + getSymbol(card.suit) + chalk.bgWhite.white(" |"));
-  console.log(chalk.bgWhite.white("-----------"));
-}
-
-// Draw cards from deck
-function drawCard(deck) {
-  if (deck.length === 0) {
-    console.log("No more cards in deck!");
-    console.log("Shuffling deck...");
-    getDeck(stackSize);
-    shuffle(1000);
-    console.log("Deck has cards: +" + deck.length);
-  }
-  return deck.pop();
-}
-
-// Get symbol for card
-function getSymbol(suit) {
-  switch (suit) {
-    case "Herz":
-      return chalk.bgWhite.red("♥");
-    case "Pik":
-      return chalk.bgWhite.black("♠");
-    case "Kreuz":
-      return chalk.bgWhite.black("♣");
-    case "Karo":
-      return chalk.bgWhite.red("♦");
-  }
-}
-
-// Auxiliary function to get colored rank
-function getRank(card) {
-  switch (card.suit) {
-    case "Herz":
-      return chalk.bgWhite.red(card.rank);
-    case "Pik":
-      return chalk.bgWhite.black(card.rank);
-    case "Kreuz":
-      return chalk.bgWhite.black(card.rank);
-    case "Karo":
-      return chalk.bgWhite.red(card.rank);
-  }
-}
-
-// Calculate hand value
-function calcHand(hand) {
-  let sum = 0;
-  for (const card of hand) {
-    sum += card.value;
-  }
-  if (sum > 21) {
-    for (const card of hand) {
-      if (card.rank === "A" && sum > 21) {
-        sum -= 10;
-      }
-    }
-  }
-  return sum;
-}
-
-// Print hand
-function printHand(hand) {
-  const output = ["", "", "", "", "", "", ""];
-  for (const card of hand) {
-    output[0] += chalk.bgWhite.white("-----------");
-    output[1] += chalk.bgWhite.white("| ") + getSymbol(card.suit) + chalk.bgWhite.white("       |");
-    output[2] += chalk.bgWhite.white("|         |");
-    if (card.rank === "10") {
-      // Padding has to be adapted for 10
-      output[3] += chalk.bgWhite.white("|    ") + getRank(card) + chalk.bgWhite.white("   |");
-    } else {
-      output[3] += chalk.bgWhite.white("|    ") + getRank(card) + chalk.bgWhite.white("    |");
-    }
-    output[4] += chalk.bgWhite.white("|         |");
-    output[5] += chalk.bgWhite.white("|       ") + getSymbol(card.suit) + chalk.bgWhite.white(" |");
-    output[6] += chalk.bgWhite.white("-----------");
-  }
-  for (const line of output) {
-    console.log(line);
-  }
-}
-
-// Statistics class
-class Stats {
-  constructor() {
-    this.wins = 0;
-    this.losses = 0;
-    this.draws = 0;
-    this.blackjacks = 0;
-  }
-
-  getGames() {
-    return this.wins + this.losses + this.draws;
-  }
-
-  getWinrate() {
-    return Math.round((this.wins / this.getGames()) * 100);
-  }
-
-  addWin() {
-    this.wins++;
-  }
-
-  addLoss() {
-    this.losses++;
-  }
-
-  addDraw() {
-    this.draws++;
-  }
-
-  addBlackjack() {
-    this.blackjacks++;
-  }
-
-  addGame() {
-    this.games++;
-  }
-
-  getRevenue(moneyNow, startingMoney) {
-    return moneyNow - startingMoney;
-  }
-
-  getAverageRevenue(moneyNow, startingMoney) {
-    return Math.round((this.getRevenue(moneyNow, startingMoney) / this.getGames()) * 100) / 100;
-  }
-
-  printStats(moneymgmt) {
-    sleep(200);
-    console.log("---STATS---");
-    sleep(200);
-    console.log("Wins: " + this.wins);
-    sleep(200);
-    console.log("Losses: " + this.losses);
-    sleep(200);
-    console.log("Draws: " + this.draws);
-    sleep(200);
-    console.log("Blackjacks: " + this.blackjacks);
-    sleep(200);
-    console.log("Games played: " + this.getGames());
-    sleep(200);
-    console.log("Winrate: " + this.getWinrate() + "%");
-    sleep(500);
-    console.log("Revenue: " + this.getRevenue(moneymgmt.getMoney(), moneymgmt.getStartMoney()));
-    sleep(200);
-    console.log("Average revenue per game: " + this.getAverageRevenue(moneymgmt.getMoney(), moneymgmt.getStartMoney()));
-    sleep(200);
-  }
-
-  reset() {
-    this.wins = 0;
-    this.losses = 0;
-    this.draws = 0;
-    this.blackjacks = 0;
-  }
-}
+const deckHandler = new DeckHandler();
 
 const stats = new Stats();
 
-// Class for managing money
-class MoneyManager {
-  constructor() {
-    this.money = 1000;
-    this.startMoney = 1000;
-    this.startBet = 0;
-    this.lastBet = 0;
-    this.didWin = false;
-  }
-
-  getMoney() {
-    return this.money;
-  }
-
-  getStartMoney() {
-    return this.startMoney;
-  }
-
-  getStartBet() {
-    return this.startBet;
-  }
-
-  getLastBet() {
-    return this.lastBet;
-  }
-
-  getDidWin() {
-    return this.didWin;
-  }
-
-  setMoney(money) {
-    this.money = money;
-  }
-
-  setStartMoney(startMoney) {
-    this.startMoney = startMoney;
-  }
-
-  setStartBet(startBet) {
-    this.startBet = startBet;
-  }
-
-  setLastBet(lastBet) {
-    this.lastBet = lastBet;
-  }
-
-  setDidWin(didWin) {
-    this.didWin = didWin;
-  }
-
-  addMoney(money) {
-    this.money += money;
-  }
-
-  subMoney(money) {
-    this.money -= money;
-  }
-
-  printMoney() {
-    console.log("You have " + this.money + "€.");
-  }
-
-  // Double the bet if lost, reset if won
-  getNextBet() {
-    if (this.getLastBet() === 0) {
-      return this.startBet;
-    }
-    if (this.didWin) {
-      this.didWin = false;
-      return this.startBet;
-    } else {
-      if (this.getLastBet() * 2 > this.getMoney()) {
-        return this.getMoney();
-      }
-      return this.getLastBet() * 2;
-    }
-  }
-
-  reset() {
-    this.money = this.startMoney;
-    this.startBet = 0;
-    this.lastBet = 0;
-    this.didWin = false;
-  }
-
-  // Unable to bet if money is less than 2
-  checkMoney() {
-    if (this.getMoney() < 2) {
-      return false;
-    }
-    return true;
-  }
-}
-
-const moneyManager = new MoneyManager();
+const util = new Util();
 
 function printEnd(playerHand, dealerHand) {
   console.log("Game summary: (Game " + stats.getGames() + ")");
   console.log("Your hand was:");
-  printHand(playerHand);
-  console.log("Your total was: " + calcHand(playerHand));
+  util.printHand(playerHand);
+  console.log("Your total was: " + util.calcHand(playerHand));
   console.log("Dealer hand was:");
-  printHand(dealerHand);
-  console.log("Dealer total was: " + calcHand(dealerHand));
-}
-
-// Automatically play game by using blackjack strategy, return 0 = Hit, 1 = Stand, 2 = Show hands, 3 = Insurance, 4 = Double down
-function autodecide(playerHand, dealerHand) {
-  sleep(1000);
-  // Check if player has only two cards
-  if (playerHand.length === 2 && containsAce(playerHand)) {
-    switch (calcHand(playerHand)) {
-      case 12:
-      case 13:
-      case 14:
-      case 15:
-      case 16:
-      case 17:
-        if (dealerHand[0].value === 4 || dealerHand[0].value === 5 || dealerHand[0].value === 6) {
-          return 4;
-        } else {
-          return 0;
-        }
-      case 18:
-        if (dealerHand[0].value === 9 || dealerHand[0].value === 10 || dealerHand[0].value === 11) {
-          return 0;
-        } else if (dealerHand[0].value === 2 || dealerHand[0].value === 7 || dealerHand[0].value === 8) {
-          return 1;
-        } else {
-          return 4;
-        }
-      default:
-        return 1;
-    }
-  } else {
-    switch (calcHand(playerHand)) {
-      case 1:
-      case 2:
-      case 3:
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      case 8:
-        return 0;
-      case 9:
-        if (
-          dealerHand[0].value === 3 ||
-          dealerHand[0].value === 4 ||
-          dealerHand[0].value === 5 ||
-          dealerHand[0].value === 6
-        ) {
-          return 4;
-        } else {
-          return 0;
-        }
-      case 10:
-        if (playerHand.length === 2 && isPair(playerHand) && dealerHand[0].value >= 2 && dealerHand[0].value <= 6) {
-          // Hand is 5,5 and dealer between 2 and 6
-          return 4;
-        } else if (dealerHand[0].value === 10 || dealerHand[0].value === 11) {
-          return 0;
-        } else {
-          return 4;
-        }
-      case 11:
-        return 0;
-      case 12:
-        if (dealerHand[0].value === 4 || dealerHand[0].value === 5 || dealerHand[0].value === 6) {
-          return 1;
-        } else {
-          return 0;
-        }
-      case 13:
-      case 14:
-      case 15:
-      case 16:
-        if (
-          dealerHand[0].value === 2 ||
-          dealerHand[0].value === 3 ||
-          dealerHand[0].value === 4 ||
-          dealerHand[0].value === 5 ||
-          dealerHand[0].value === 6
-        ) {
-          return 0;
-        } else {
-          return 1;
-        }
-      default:
-        return 1;
-    }
-  }
-}
-
-// Check if hand contains Ace
-function containsAce(hand) {
-  for (const card of hand) {
-    if (card.rank === "A") {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Check if hand has two identical cards
-function isPair(hand) {
-  if (hand.length === 2) {
-    if (hand[0].rank === hand[1].rank) {
-      return true;
-    }
-  }
-  return false;
+  util.printHand(dealerHand);
+  console.log("Dealer total was: " + util.calcHand(dealerHand));
 }
 
 // Start game
@@ -462,13 +75,12 @@ function play(autoplay) {
   let currentBet = 0;
   let insurance = false;
   let surrender = false;
-  getDeck(stackSize);
-  shuffle(1000);
+  deckHandler.shuffle(1000);
   while (game) {
     insurance = false;
     if (!moneyManager.checkMoney()) {
       console.log("You are out of money!");
-      sleep(1000);
+      util.sleep(1000);
       game = false;
       break;
     }
@@ -486,41 +98,41 @@ function play(autoplay) {
       }
     }
     console.log("You bet " + currentBet + "€");
-    sleep(500);
+    util.sleep(500);
     // set last bet and subtract money
     moneyManager.setLastBet(currentBet);
     moneyManager.subMoney(currentBet);
     const dealerHand = [];
     const playerHand = [];
     console.log("Both players are drawing their first cards...");
-    sleep(1000);
+    util.sleep(1000);
     // Draw initial 2 cards for each player
     for (let i = 0; i < 2; i++) {
-      dealerHand.push(drawCard(deck));
-      playerHand.push(drawCard(deck));
+      dealerHand.push(deckHandler.drawCard());
+      playerHand.push(deckHandler.drawCard());
     }
     // Print cards
     console.log("Visible Dealer card:");
-    printCard(dealerHand[0]);
-    sleep(500);
+    util.printCard(dealerHand[0]);
+    util.sleep(500);
     console.log("Player:");
-    printHand(playerHand);
+    util.printHand(playerHand);
     // Check for blackjack
     let playerturn = true;
     let dealerturn = false;
     while (playerturn) {
       if (
-        calcHand(playerHand) === 21 ||
-        (playerHand.length === 5 && calcHand(playerHand) < 21) ||
-        calcHand(playerHand) > 21
+        util.calcHand(playerHand) === 21 ||
+        (playerHand.length === 5 && util.calcHand(playerHand) < 21) ||
+        util.calcHand(playerHand) > 21
       ) {
         playerturn = false;
         dealerturn = true;
-        sleep(500);
+        util.sleep(500);
       } else {
         console.log(
           "Your hand value: " +
-            chalk.green(calcHand(playerHand)) +
+            chalk.green(util.calcHand(playerHand)) +
             " | Dealer hand value: " +
             chalk.yellow(dealerHand[0].value),
         );
@@ -531,7 +143,7 @@ function play(autoplay) {
         const actionOptions = [chalk.green("Hit"), chalk.red("Stand"), chalk.blue("Show hands"), chalk.magenta("Clue")];
         if (autoplay) {
           console.log("Autoplaying...");
-          sleep(250);
+          util.sleep(250);
           action = autodecide(playerHand, dealerHand);
         } else {
           if (playerHand.length === 2) {
@@ -547,7 +159,7 @@ function play(autoplay) {
               actionOptions.push(chalk.blue("Double down"));
             }
             // Check if player can split
-            if (isPair(playerHand)) {
+            if (util.isPair(playerHand)) {
               // Needs further work, not planned right now
               // actionOptions.push('Split')
             }
@@ -583,30 +195,30 @@ function play(autoplay) {
         if (action === 0) {
           console.clear();
           console.log("You are drawing a card...");
-          sleep(1300);
-          playerHand.push(drawCard(deck));
+          util.sleep(1300);
+          playerHand.push(deckHandler.drawCard());
           console.log("You draw:");
-          printCard(playerHand[playerHand.length - 1]);
-          sleep(500);
+          util.printCard(playerHand[playerHand.length - 1]);
+          util.sleep(500);
           console.log("Your hand:");
-          printHand(playerHand);
-          sleep(500);
+          util.printHand(playerHand);
+          util.sleep(500);
           console.log("Visible Dealer card:");
-          printCard(dealerHand[0]);
+          util.printCard(dealerHand[0]);
         } else if (action === 1) {
           playerturn = false;
           dealerturn = true;
           console.clear();
-          console.log("You stand with a hand value of: " + calcHand(playerHand));
-          sleep(1000);
+          console.log("You stand with a hand value of: " + util.calcHand(playerHand));
+          util.sleep(1000);
         } else if (action === 2) {
           console.clear();
           console.log("Showing hands...");
-          sleep(1000);
+          util.sleep(1000);
           console.log("Your hand:");
-          printHand(playerHand);
+          util.printHand(playerHand);
           console.log("Visible Dealer card:");
-          printCard(dealerHand[0]);
+          util.printCard(dealerHand[0]);
         } else if (action === 3) {
           console.clear();
           let insuranceBet = 0;
@@ -616,25 +228,25 @@ function play(autoplay) {
             insuranceBet = currentBet / 2;
           }
           console.log("You buy insurance for " + insuranceBet + "€");
-          sleep(1000);
+          util.sleep(1000);
           moneyManager.subMoney(currentBet / 2);
           playerturn = false;
           insurance = true;
         } else if (action === 4) {
           console.clear();
           console.log("You double down for " + currentBet + "€");
-          sleep(1000);
+          util.sleep(1000);
           moneyManager.subMoney(currentBet);
           currentBet = currentBet * 2;
-          playerHand.push(drawCard(deck));
+          playerHand.push(deckHandler.drawCard());
           console.log("You draw:");
-          printCard(playerHand[playerHand.length - 1]);
-          sleep(500);
+          util.printCard(playerHand[playerHand.length - 1]);
+          util.sleep(500);
           console.log("Your hand:");
-          printHand(playerHand);
-          sleep(500);
+          util.printHand(playerHand);
+          util.sleep(500);
           console.log("Visible Dealer card:");
-          printCard(dealerHand[0]);
+          util.printCard(dealerHand[0]);
           playerturn = false;
           dealerturn = true;
         } else if (action === 5) {
@@ -656,13 +268,13 @@ function play(autoplay) {
               console.log("Recommended action based on your hand and the visible dealer card: " + chalk.red("Stand"));
               break;
           }
-          sleep(1000);
+          util.sleep(1000);
           console.log("Showing hands...");
-          sleep(1000);
+          util.sleep(1000);
           console.log("Your hand:");
-          printHand(playerHand);
+          util.printHand(playerHand);
           console.log("Visible Dealer card:");
-          printCard(dealerHand[0]);
+          util.printCard(dealerHand[0]);
         } else if (action === 6) {
           playerturn = false;
           dealerturn = false;
@@ -673,21 +285,21 @@ function play(autoplay) {
     while (dealerturn) {
       // Reveal second card
       console.log("Dealer hand:");
-      printHand(dealerHand);
-      console.log("Dealer total: " + calcHand(dealerHand));
-      if (calcHand(dealerHand) >= 17 || dealerHand.length === 5) {
+      util.printHand(dealerHand);
+      console.log("Dealer total: " + util.calcHand(dealerHand));
+      if (util.calcHand(dealerHand) >= 17 || dealerHand.length === 5) {
         dealerturn = false;
       } else {
         console.log("Dealer draws...");
-        sleep(2000);
+        util.sleep(2000);
         console.clear();
         console.log("Dealer draws:");
-        dealerHand.push(drawCard(deck));
-        printCard(dealerHand[dealerHand.length - 1]);
-        sleep(1000);
+        dealerHand.push(deckHandler.drawCard());
+        util.printCard(dealerHand[dealerHand.length - 1]);
+        util.sleep(1000);
       }
     }
-    sleep(1500);
+    util.sleep(1500);
     console.clear();
     // WIN CONDITIONS
     // Blackjack pays 3:2, other wins pay 1:1, Tie returns bet
@@ -696,9 +308,9 @@ function play(autoplay) {
       surrender = false;
       console.clear();
       console.log("You surrender and get half your bet back");
-      sleep(1000);
+      util.sleep(1000);
       moneyManager.addMoney(currentBet / 2);
-    } else if (calcHand(playerHand) === 21 && calcHand(dealerHand) !== 21 && dealerHand.length !== 5) {
+    } else if (util.calcHand(playerHand) === 21 && util.calcHand(dealerHand) !== 21 && dealerHand.length !== 5) {
       // Player has blackjack or dealer doesn't
       console.log("You have a Blackjack! You win!");
       stats.addWin();
@@ -709,18 +321,18 @@ function play(autoplay) {
       console.log("You have " + moneyManager.getMoney() + "€.");
     } else if (
       playerHand.length === 5 &&
-      calcHand(playerHand) < 21 &&
-      calcHand(dealerHand) !== 21 &&
+      util.calcHand(playerHand) < 21 &&
+      util.calcHand(dealerHand) !== 21 &&
       dealerHand.length < 5
     ) {
       // Player has 5 cards and dealer doesn't
-      console.log("You have 5 cards and a total of " + calcHand(playerHand) + "! You win!");
+      console.log("You have 5 cards and a total of " + util.calcHand(playerHand) + "! You win!");
       stats.addWin();
       console.log("You won " + currentBet * 2 + "!");
       moneyManager.addMoney(currentBet * 2);
       moneyManager.setDidWin(true);
       console.log("You have " + moneyManager.getMoney() + "€.");
-    } else if (calcHand(playerHand) > calcHand(dealerHand) && calcHand(playerHand) <= 21) {
+    } else if (util.calcHand(playerHand) > util.calcHand(dealerHand) && util.calcHand(playerHand) <= 21) {
       // Player has higher hand value than dealer
       console.log("You have a higher hand value than the dealer! You win!");
       stats.addWin();
@@ -728,10 +340,10 @@ function play(autoplay) {
       moneyManager.addMoney(currentBet * 2);
       moneyManager.setDidWin(true);
     } else if (
-      calcHand(dealerHand) === 21 &&
-      calcHand(playerHand) !== 21 &&
+      util.calcHand(dealerHand) === 21 &&
+      util.calcHand(playerHand) !== 21 &&
       playerHand.length !== 5 &&
-      calcHand(playerHand) < 21
+      util.calcHand(playerHand) < 21
     ) {
       // Dealer has blackjack and player doesn't
       console.log("Dealer has a Blackjack! Dealer wins!");
@@ -743,18 +355,18 @@ function play(autoplay) {
       }
     } else if (
       dealerHand.length === 5 &&
-      calcHand(dealerHand) < 21 &&
-      calcHand(playerHand) !== 21 &&
+      util.calcHand(dealerHand) < 21 &&
+      util.calcHand(playerHand) !== 21 &&
       playerHand.length < 5
     ) {
       // Dealer has 5 cards and player doesn't
       console.log("Dealer has 5 cards! Dealer wins!");
       stats.addLoss();
-    } else if (calcHand(playerHand) > 21 && calcHand(dealerHand) <= 21) {
+    } else if (util.calcHand(playerHand) > 21 && util.calcHand(dealerHand) <= 21) {
       // Player went over 21
       console.log("You went over 21! Dealer wins!");
       stats.addLoss();
-    } else if (calcHand(dealerHand) > 21 && calcHand(playerHand) <= 21) {
+    } else if (util.calcHand(dealerHand) > 21 && util.calcHand(playerHand) <= 21) {
       // Dealer went over 21
       console.log("Dealer went over 21! You win!");
       stats.addWin();
@@ -762,7 +374,7 @@ function play(autoplay) {
       moneyManager.addMoney(currentBet * 2);
       moneyManager.setDidWin(true);
       console.log("You have " + moneyManager.getMoney() + "€.");
-    } else if (calcHand(dealerHand) > calcHand(playerHand) && calcHand(dealerHand) <= 21) {
+    } else if (util.calcHand(dealerHand) > util.calcHand(playerHand) && util.calcHand(dealerHand) <= 21) {
       // Dealer has higher hand value than player
       console.log("Dealer has a higher hand value than you! Dealer wins!");
       stats.addLoss();
@@ -782,14 +394,14 @@ function play(autoplay) {
       game = false;
       // Print stats
       stats.printStats(moneyManager);
-      sleep(500);
+      util.sleep(500);
       start = readlineSync.keyInPause("Press any key to go back to the main menu.");
       menu = "h";
     } else {
       game = true;
     }
   }
-  sleep(50);
+  util.sleep(50);
   console.clear();
   menu = "h";
 }
@@ -930,16 +542,16 @@ while (menu !== "x") {
       switch (start) {
         case 0: {
           console.clear();
-          let newStackSize = readlineSync.questionInt("Enter new stack size (1-16) [DEFAULT: 4] : ");
+          let newStackSize = readlineSync.questionInt("Enter new stack size (1-16) [DEFAULT: 4 | CURRENT: " + config.get("stackSize") + "] : ");
           while (newStackSize < 1 || newStackSize > 16) {
             console.log("Invalid stack size. Please try again.");
-            newStackSize = readlineSync.questionInt("Enter new stack size (1-16) [DEFAULT: 4] : ");
+            newStackSize = readlineSync.questionInt("Enter new stack size (1-16) [DEFAULT: 4 | CURRENT: " + config.get("stackSize") + "] : ");
           }
           console.log("Changing stack size to " + newStackSize + "...");
-          sleep(1000);
-          stackSize = newStackSize;
+          util.sleep(1000);
+          config.set("stackSize", newStackSize);
           console.log("Stack size changed!");
-          sleep(1000);
+          util.sleep(1000);
           newStackSize = readlineSync.keyInPause("Press any key to go back to the main menu.");
           menu = "h";
           break;
@@ -947,25 +559,26 @@ while (menu !== "x") {
         case 1:
           console.clear();
           console.log("Resetting stats...");
-          sleep(1000);
+          util.sleep(1000);
           stats.reset();
           console.log("Stats reset!");
-          sleep(1000);
+          util.sleep(1000);
           readlineSync.keyInPause("Press any key to go back to the main menu.");
           menu = "h";
           break;
         case 2: {
           console.clear();
-          let newStartingMoney = readlineSync.questionInt("Enter new starting money (2-50.000) [DEFAULT: 1.000] : ");
+          let newStartingMoney = readlineSync.questionInt("Enter new starting money (2-50.000) [DEFAULT: 1.000 | CURRENT: " + config.get("startMoney") + "] : ");
           while (newStartingMoney < 2 || newStartingMoney > 50000) {
             console.log("Invalid starting money. Please try again.");
             newStartingMoney = readlineSync.questionInt("Enter new starting money (2-50.000) [DEFAULT: 1.000] : ");
           }
           console.log("Changing starting money to " + newStartingMoney + "...");
-          sleep(1000);
+          util.sleep(1000);
+          config.set("startMoney", newStartingMoney);
           moneyManager.setStartMoney(newStartingMoney);
           console.log("Starting money changed!");
-          sleep(1000);
+          util.sleep(1000);
           readlineSync.keyInPause("Press any key to go back to the main menu.");
           menu = "h";
           break;
@@ -984,7 +597,7 @@ while (menu !== "x") {
       console.clear();
       console.log("Thanks for playing!");
       console.log("-------------------");
-      sleep(1500);
+      util.sleep(1500);
       console.clear();
       menu = "x";
       break;
