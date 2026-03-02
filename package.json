@@ -1,7 +1,7 @@
 {
 	"name": "@suptower/blackjack",
 	"version": "1.8.0",
-	"description": "",
+	"description": "Play Blackjack directly from your terminal.",
 	"date": "Updated on 11th of September 2023.",
 	"exports": "./bin/index.js",
 	"type": "module",
@@ -16,24 +16,46 @@
 		"autodate": "node updatePackageDate.js"
 	},
 	"keywords": [
-		"blackjack"
+		"blackjack",
+		"node",
+		"nodejs",
+		"cli",
+		"terminal",
+		"javascript",
+		"js",
+		"npm",
+		"npm-package",
+		"card-game",
+		"game",
+		"open-source"
 	],
 	"author": "suptower",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/suptower/js-blackjack"
+	},
+	"bugs": {
+		"url": "https://github.com/suptower/js-blackjack/issues"
+	},
+	"homepage": "https://github.com/suptower/js-blackjack#readme",
+	"publishConfig": {
+		"access": "public"
+	},
 	"dependencies": {
 		"chalk": "^5.2.0",
-		"commit-and-tag-version": "^11.2.2",
 		"conf": "^11.0.2",
-		"eslint-config-prettier": "^8.8.0",
-		"prettier": "^2.8.8",
 		"readline-sync": "^1.4.10"
 	},
 	"devDependencies": {
+		"commit-and-tag-version": "^11.2.2",
 		"eslint": "^8.40.0",
+		"eslint-config-prettier": "^8.8.0",
 		"eslint-config-standard": "^17.0.0",
 		"eslint-plugin-import": "^2.27.5",
 		"eslint-plugin-n": "^15.7.0",
-		"eslint-plugin-promise": "^6.1.1"
+		"eslint-plugin-promise": "^6.1.1",
+		"prettier": "^2.8.8"
 	},
 	"engines": {
 		"node": ">=16.0.0"
