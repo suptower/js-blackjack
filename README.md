@@ -1,6 +1,6 @@
 # js-blackjack
 
-Little JavaScript project testing GitHub Copilot and Node.js
+Play Blackjack directly from your terminal.
 
 <p align="center">
   <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/suptower/js-blackjack">
@@ -10,10 +10,16 @@ Little JavaScript project testing GitHub Copilot and Node.js
   <a href="https://app.codacy.com/gh/suptower/js-blackjack/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"><img src="https://app.codacy.com/project/badge/Grade/d85c5c9b3fc44a4ba83d08a0ba92e8b2"/></a>
 </p>
 
-## Playing
+## Install
 
-To run the game, install the package, then:
+via `npm`
 
 ```
-node .
+npm install -g @suptower/blackjack
+```
+
+## Usage
+
+```
+blackjack
 ```
